@@ -1,0 +1,48 @@
+{
+  "name": "apollo-rigor-erp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --import ./scripts/portable-tools.mjs ./node_modules/vite/bin/vite.js",
+    "build": "node --import ./scripts/portable-tools.mjs ./node_modules/vite/bin/vite.js build",
+    "preview": "node --import ./scripts/portable-tools.mjs ./node_modules/vite/bin/vite.js preview",
+    "lint": "eslint src tests scripts *.config.js eslint-frontend-rules.js --max-warnings 0",
+    "test": "node --test tests/unit/*.test.js",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "check:architecture": "node scripts/check-architecture.mjs"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6",
+    "tailwind-merge": "^2.6.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@fontsource/bodoni-moda": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/manrope": "5.3.0",
+    "@playwright/test": "^1.63.0",
+    "@rollup/wasm-node": "4.62.2",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.6.1",
+    "esbuild-wasm": "0.27.7",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2",
+    "vite": "^7.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.27.7": true
+  }
+}

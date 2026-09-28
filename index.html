@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Apollo Rigor — Ateliê de cerimônia</title>
+    <link rel="stylesheet" href="/src/index.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('apollo-theme');
+          var theme = saved === 'light' || saved === 'dark' ? saved : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <main class="loading-screen" aria-busy="true">
+        <div role="status" aria-live="polite" aria-atomic="true">
+          <p class="loading-brand">Apollo Rigor</p>
+          <div class="loading-track" aria-hidden="true"><span class="loading-thread"></span></div>
+          <p class="loading-message">Carregando página…</p>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

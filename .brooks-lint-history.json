@@ -1,0 +1,16 @@
+[
+  {
+    "date": "2026-09-28",
+    "mode": "Architecture Audit",
+    "score": 30,
+    "findings": { "critical": 2, "warning": 8, "suggestion": 0 },
+    "scope": "Frontend src, CSS global e configuracoes de entrada/deploy"
+  },
+  {
+    "date": "2026-09-28",
+    "mode": "Architecture Audit",
+    "score": 83,
+    "findings": { "critical": 0, "warning": 3, "suggestion": 2 },
+    "scope": "Frontend src (114 modulos JS/JSX), estilos, contratos de persistencia e configuracoes"
+  }
+]
