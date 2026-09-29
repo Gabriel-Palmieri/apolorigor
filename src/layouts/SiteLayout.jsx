@@ -1,18 +1,19 @@
 import { useCallback, useState } from "react";
 import { Outlet, useLocation, useMatch, useNavigate } from "react-router-dom";
 import SiteNav from "./SiteNav.jsx";
-import ProdutoModal from "../features/catalog/ProdutoModal.jsx";
-import { useSessao } from "../features/conta/session.js";
-import { useCatalogo } from "../data/useData.js";
+import DetalheProdutoVitrine from "../features/catalogo/DetalheProdutoVitrine.jsx";
+import { useSessao } from "../features/conta/sessao.js";
+import { useCatalogo, useData } from "../data/useData.js";
 import { useSiteNavigation } from "../app/useSiteNavigation.js";
 import { SITE_PATHS } from "../app/navigation.js";
-import HomeAtelie from "../features/home/HomeAtelie.jsx";
+import InicioAtelie from "../features/inicio/InicioAtelie.jsx";
 const DRAFT_KEY = "apollo-pedido-rascunho";
 export default function SiteLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const go = useSiteNavigation();
   const catalogo = useCatalogo();
+  const { initialized } = useData();
   const produtoRoute = useMatch("/colecao/:produtoId");
   const produtoAberto = catalogo.find(
     (p) => String(p.id) === produtoRoute?.params.produtoId,
@@ -66,17 +67,17 @@ export default function SiteLayout() {
             }}
           />
         </main>
-        <HomeAtelie go={go} />
+        <InicioAtelie go={go} />
       </div>
       {produtoAberto && (
-        <ProdutoModal
+        <DetalheProdutoVitrine
           key={produtoAberto.id}
           produto={produtoAberto}
           onClose={() => navigate("/colecao" + location.search)}
           onContinuar={continuarPedido}
         />
       )}
-      {produtoRoute && !produtoAberto && (
+      {initialized && produtoRoute && !produtoAberto && (
         <p className="product-missing" role="status">
           Modelo não encontrado.{" "}
           <button onClick={() => go("colecao")}>Voltar à coleção</button>

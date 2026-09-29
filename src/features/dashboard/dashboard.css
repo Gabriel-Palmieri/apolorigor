@@ -1,0 +1,17 @@
+@layer components {
+  .dashboard-number {
+    @apply font-medium tabular-nums text-gold-text;
+  }
+  .dashboard-heading {
+    @apply m-0 min-h-11 flex items-center font-sans text-lg font-semibold text-text;
+  }
+  .dashboard-task {
+    @apply flex items-center justify-between gap-5 py-6 border-b border-border-soft last:border-0 no-underline hover:text-gold-text;
+  }
+  .dashboard-text-link {
+    @apply inline-flex items-center min-h-11 text-sm text-gold-text underline underline-offset-4 hover:text-text;
+  }
+  .dashboard-summary {
+    @apply mt-10 border-t border-border;
+  }
+}

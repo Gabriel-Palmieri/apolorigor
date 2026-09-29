@@ -1,17 +1,9 @@
-import { useSyncExternalStore } from 'react';
-import { getData, subscribeData, getStorageStatus, setProdutos, setTrans, setAjustes } from './appData.js';
+import { useMemo, useSyncExternalStore } from "react";
+import { getData, subscribeData } from "./cache.js";
 export function useData() {
-  const state = useSyncExternalStore(subscribeData, getData, getData);
-  return {
-    ...state,
-    setProdutos,
-    setTrans,
-    setAjustes
-  };
+  return useSyncExternalStore(subscribeData, getData, getData);
 }
 export function useCatalogo() {
-  return useData().produtos;
-}
-export function useStorageStatus() {
-  return useSyncExternalStore(subscribeData, getStorageStatus, getStorageStatus);
+  const { produtos } = useData();
+  return useMemo(() => produtos.filter((p) => p.ativo), [produtos]);
 }

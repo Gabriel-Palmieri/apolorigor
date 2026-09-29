@@ -1,5 +1,8 @@
-import { Card } from "../../shared/ui/Surfaces.jsx";
-import { SectionTitle, Heading } from "../../shared/ui/Typography.jsx";
+import { Card } from "../../shared/ui/estrutura/Surfaces.jsx";
+import {
+  SectionTitle,
+  Heading,
+} from "../../shared/ui/estrutura/Typography.jsx";
 import { cn } from "../../shared/lib/cn.js";
 import { useData } from "../../data/useData.js";
 import { useState, useMemo } from "react";
@@ -9,13 +12,13 @@ import {
   iso,
   startOfWeek,
   parse,
-} from "../../features/agenda/calendar.js";
+} from "../../features/agenda/calendario.js";
 import { buildEventos, aggDia } from "../../domain/agenda.js";
 import { navBtn } from "../../features/agenda/CalendarioUI.jsx";
-import MonthView from "../../features/agenda/MonthView.jsx";
-import WeekView from "../../features/agenda/WeekView.jsx";
-import AgendaView from "../../features/agenda/AgendaView.jsx";
-import DayView from "../../features/agenda/DayView.jsx";
+import VisaoMes from "../../features/agenda/VisaoMes.jsx";
+import VisaoSemana from "../../features/agenda/VisaoSemana.jsx";
+import VisaoAgenda from "../../features/agenda/VisaoAgenda.jsx";
+import VisaoDia from "../../features/agenda/VisaoDia.jsx";
 export default function Anuario() {
   const { produtos, trans } = useData();
   const [modo, setModo] = useState("agenda");
@@ -169,10 +172,10 @@ export default function Anuario() {
 
       <Card className="mb-4">
         {modo === "agenda" && (
-          <AgendaView eventos={eventos} cap={cap} onSelectDay={irParaDia} />
+          <VisaoAgenda eventos={eventos} cap={cap} onSelectDay={irParaDia} />
         )}
         {modo === "mes" && (
-          <MonthView
+          <VisaoMes
             cursor={cursor}
             eventos={eventos}
             cap={cap}
@@ -181,7 +184,7 @@ export default function Anuario() {
           />
         )}
         {modo === "semana" && (
-          <WeekView
+          <VisaoSemana
             cursor={cursor}
             eventos={eventos}
             cap={cap}
@@ -190,7 +193,7 @@ export default function Anuario() {
           />
         )}
         {modo === "dia" && (
-          <DayView
+          <VisaoDia
             dstr={selected}
             produtos={produtos}
             eventos={eventos}
@@ -204,7 +207,7 @@ export default function Anuario() {
           <SectionTitle>
             DETALHES DE {fmtDate(selected).toUpperCase()}
           </SectionTitle>
-          <DayView
+          <VisaoDia
             dstr={selected}
             produtos={produtos}
             eventos={eventos}

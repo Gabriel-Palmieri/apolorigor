@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { installApi } from '../helpers/api.js';
+test.beforeEach(async ({ page }) => { await installApi(page); });
 
 test('initial loading screen is visible before the application bundle arrives', async ({ page }) => {
   let release;

@@ -78,7 +78,7 @@ export default {
       },
       borderRadius: { card: "var(--radius)", control: "var(--radius-sm)" },
       boxShadow: { surface: "var(--shadow)" },
-      maxWidth: ({ theme }) => ({ ...theme('spacing'), site: "73.75rem", form: "45rem", measure: "46ch" }),
+      maxWidth: ({ theme }) => ({ ...theme('spacing'), site: "clamp(73.75rem, 92vw, 100rem)", form: "45rem", measure: "46ch" }),
       minWidth: ({ theme }) => ({ ...theme('spacing') }),
       minHeight: ({ theme }) => ({ ...theme('spacing') }),
       width: { dialog: "calc(100% - 2rem)" },

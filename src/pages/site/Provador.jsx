@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCatalogo } from "../../data/useData.js";
 import { ternosParaProva } from "../../domain/provador.js";
-import { Wrap } from "../../layouts/Content.jsx";
-import { Display } from "../../shared/ui/Typography.jsx";
-import { Button } from "../../shared/ui/Button.jsx";
-import PhotoCapture from "../../features/provador/PhotoCapture.jsx";
-import GarmentPicker from "../../features/provador/GarmentPicker.jsx";
-import FittingPreview from "../../features/provador/FittingPreview.jsx";
-import { useProvadorPhoto } from "../../features/provador/useProvadorPhoto.js";
+import { Wrap } from "../../shared/ui/estrutura/EstruturaConteudo.jsx";
+import { Display } from "../../shared/ui/estrutura/Typography.jsx";
+import { Button } from "../../shared/ui/botoes/Button.jsx";
+import CapturaFoto from "../../features/provador/CapturaFoto.jsx";
+import SeletorTraje from "../../features/provador/SeletorTraje.jsx";
+import PreviaProvador from "../../features/provador/PreviaProvador.jsx";
+import { useFotoProvador } from "../../features/provador/useFotoProvador.js";
 export default function Provador() {
   const modelos = ternosParaProva(useCatalogo());
   const [params, setParams] = useSearchParams();
@@ -16,7 +16,7 @@ export default function Provador() {
   const selected = requested
     ? modelos.find((modelo) => String(modelo.id) === requested)
     : modelos[0];
-  const capture = useProvadorPhoto();
+  const capture = useFotoProvador();
   const [preview, setPreview] = useState(null);
   const previewRef = useRef(null);
   const { closeCamera } = capture;
@@ -73,7 +73,7 @@ export default function Provador() {
           </div>
         ) : preview ? (
           <div ref={previewRef}>
-            <FittingPreview
+            <PreviaProvador
               {...preview}
               onBack={() => {
                 setPreview(null);
@@ -88,7 +88,7 @@ export default function Provador() {
         ) : (
           <>
             <div className="fitting-workspace">
-              <PhotoCapture capture={capture} />
+              <CapturaFoto capture={capture} />
               <div className="fitting-selection">
                 {!selected && (
                   <p role="status" className="fitting-error">
@@ -96,7 +96,7 @@ export default function Provador() {
                     abaixo.
                   </p>
                 )}
-                <GarmentPicker
+                <SeletorTraje
                   modelos={modelos}
                   selected={selected}
                   onSelect={select}

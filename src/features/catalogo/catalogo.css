@@ -1,0 +1,135 @@
+@layer components {
+  .product-missing {
+    @apply p-8 font-sans text-text bg-bg;
+  }
+  .produto-dialog {
+    @apply max-w-4xl;
+  }
+}
+
+@layer components {
+  .occasion-link {
+    @apply min-w-0 text-left bg-transparent border-0 cursor-pointer;
+  }
+  .product-card {
+    @apply block text-left w-full min-w-0 cursor-pointer bg-transparent border-0 p-0 font-sans;
+  }
+  .product-card:hover > p:first-of-type {
+    @apply text-gold-text;
+  }
+  .product-card:focus-visible {
+    @apply outline-offset-4;
+  }
+}
+
+@layer components {
+  .collection-intro {
+    @apply mb-8 flex flex-wrap items-end justify-between gap-5;
+  }
+  .occasion-navigation {
+    @apply mb-10 grid grid-cols-2 gap-x-6 gap-y-6 desktop:grid-cols-4;
+  }
+  .occasion-link {
+    @apply border-t border-border pt-4;
+  }
+  .occasion-title {
+    @apply flex min-h-11 items-center justify-between gap-3 text-base font-medium text-text;
+  }
+  .occasion-title svg {
+    @apply size-4 shrink-0 text-text-sub;
+  }
+  .occasion-description {
+    @apply mt-1 block text-sm leading-relaxed text-text-sub;
+  }
+  .occasion-link:hover {
+    @apply border-gold;
+  }
+  .occasion-link:hover .occasion-title {
+    @apply text-gold-text;
+  }
+  .collection-grid {
+    @apply grid grid-cols-2 items-start gap-x-4 gap-y-10 desktop:grid-cols-3 desktop:gap-x-8 desktop:gap-y-12;
+  }
+  .product-card-photo {
+    @apply relative mb-4 overflow-hidden bg-bg-elevated;
+    aspect-ratio: 3 / 4;
+  }
+  .product-card-action {
+    @apply absolute bottom-3 right-3 flex size-10 items-center justify-center rounded-full bg-card text-text;
+    transition: transform 160ms ease-out;
+  }
+  .product-card:hover .product-card-action {
+    @apply bg-gold-strong text-button-ink;
+    transform: translateX(2px);
+  }
+  .product-card-name {
+    @apply m-0 font-display text-lg font-medium leading-tight text-text desktop:text-2xl;
+  }
+  .product-card-detail {
+    @apply mt-2 mb-0 text-xs leading-relaxed text-text-sub desktop:text-sm;
+  }
+  .product-card-prices {
+    @apply mt-4 grid grid-cols-2 gap-x-3 gap-y-2 border-t border-border pt-3 text-xs text-text-sub tabular-nums desktop:text-sm;
+  }
+  .product-card-prices > span {
+    @apply flex flex-col gap-1;
+  }
+  .product-card-prices strong {
+    @apply font-semibold text-text;
+  }
+  .product-card-prices > span > span {
+    @apply text-text;
+  }
+  .collection-page-heading {
+    @apply grid gap-6 desktop:grid-cols-pair desktop:items-end;
+  }
+  .collection-page-heading > p {
+    @apply desktop:justify-self-end;
+  }
+  .collection-tabs {
+    @apply mt-10 flex flex-wrap gap-x-6 gap-y-1 border-b border-border;
+  }
+  .collection-tab {
+    @apply min-h-12 border-0 border-b-2 border-transparent bg-transparent py-3 text-sm font-medium text-text-sub hover:text-text;
+  }
+  .collection-tab-active {
+    @apply border-gold-strong font-semibold text-text;
+  }
+  .collection-categories {
+    @apply mt-6 mb-8 flex flex-wrap items-center gap-2;
+  }
+  .collection-categories > span {
+    @apply mr-2;
+  }
+  @media (max-width: 620px) {
+    .product-card-action {
+      @apply bottom-2 right-2 size-8;
+    }
+    .occasion-description {
+      display: none;
+    }
+    .occasion-navigation {
+      @apply gap-x-4 gap-y-0;
+    }
+    .occasion-link {
+      @apply py-2;
+    }
+    .occasion-title {
+      @apply text-sm;
+    }
+    .collection-intro h2 {
+      @apply text-4xl;
+    }
+    .product-card-prices {
+      @apply grid-cols-1;
+    }
+    .product-card-prices > span {
+      @apply flex-row flex-wrap justify-between gap-x-2;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .product-card-action {
+      transition: none;
+    }
+  }
+}

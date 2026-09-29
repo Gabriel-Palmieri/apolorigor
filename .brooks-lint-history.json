@@ -3,14 +3,44 @@
     "date": "2026-09-28",
     "mode": "Architecture Audit",
     "score": 30,
-    "findings": { "critical": 2, "warning": 8, "suggestion": 0 },
+    "findings": {
+      "critical": 2,
+      "warning": 8,
+      "suggestion": 0
+    },
     "scope": "Frontend src, CSS global e configuracoes de entrada/deploy"
   },
   {
     "date": "2026-09-28",
     "mode": "Architecture Audit",
     "score": 83,
-    "findings": { "critical": 0, "warning": 3, "suggestion": 2 },
+    "findings": {
+      "critical": 0,
+      "warning": 3,
+      "suggestion": 2
+    },
     "scope": "Frontend src (114 modulos JS/JSX), estilos, contratos de persistencia e configuracoes"
+  },
+  {
+    "date": "2026-09-29",
+    "mode": "Architecture Audit",
+    "score": 88,
+    "findings": {
+      "critical": 0,
+      "warning": 2,
+      "suggestion": 2
+    },
+    "scope": "Diagnóstico anterior às correções: 128 módulos JS/JSX; grafo completo e leitura dirigida das fronteiras, comandos e persistência. Os quatro achados foram corrigidos nesta revisão."
+  },
+  {
+    "date": "2026-09-29",
+    "mode": "Architecture Audit",
+    "score": 89,
+    "findings": {
+      "critical": 0,
+      "warning": 2,
+      "suggestion": 1
+    },
+    "scope": "Estado final da reorganização: grafo AST completo dos 132 módulos JS/JSX; leitura dirigida das fronteiras, estoque, operações, persistência e sessão; exemplos de invariantes executados em memória."
   }
 ]

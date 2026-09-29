@@ -1,0 +1,171 @@
+@layer components {
+  .site-shell {
+    @apply min-h-screen bg-bg text-text font-sans;
+  }
+  .site-content {
+    @apply w-full;
+  }
+  .site-primary-nav a,
+  .site-brand {
+    @apply no-underline;
+  }
+  .site-brand {
+    @apply shrink-0;
+  }
+  .site-mobile-menu {
+    @apply hidden;
+  }
+  .site-mobile-menu summary,
+  .erp-navigation summary {
+    @apply cursor-pointer p-3 text-compact font-semibold;
+  }
+  .site-mobile-links {
+    @apply absolute top-full right-4 min-w-56 p-2 bg-card border border-border shadow-surface;
+  }
+  .site-mobile-links a {
+    @apply block p-3 text-text;
+  }
+  .site-mobile-links a:hover {
+    @apply bg-bg-elevated;
+  }
+  .erp-navigation {
+    @apply contents;
+  }
+  .erp-navigation > summary {
+    @apply hidden;
+  }
+  .erp-navigation > .erp-sidebar {
+    @apply flex !important;
+  }
+  .erp-sidebar nav a:hover {
+    @apply brightness-110;
+  }
+  @media (max-width: 900px) {
+    .site-nav-links {
+      @apply hidden !important;
+    }
+    .site-mobile-menu {
+      @apply block;
+    }
+    .site-nav-row {
+      @apply gap-3 !important;
+    }
+    .site-primary-nav {
+      @apply gap-2 !important;
+    }
+    .erp-shell {
+      @apply flex-col h-auto min-h-dvh !important;
+    }
+    .erp-navigation {
+      @apply block bg-bg-elevated text-text border-b border-border-soft;
+    }
+    .erp-navigation > summary {
+      @apply block py-4 px-5;
+    }
+    .erp-navigation:not([open]) > .erp-sidebar {
+      @apply hidden !important;
+    }
+    .erp-navigation > .erp-sidebar {
+      @apply w-full !important;
+    }
+    .erp-heading {
+      @apply flex-wrap;
+    }
+    .erp-header {
+      @apply pt-5 px-5 pb-0 !important;
+    }
+    .erp-main {
+      @apply p-5 !important;
+      @apply overflow-visible !important;
+    }
+  }
+  @media (max-width: 480px) {
+    .site-primary-nav .site-account-link {
+      @apply hidden !important;
+    }
+    .site-nav-row {
+      @apply py-0 px-4 !important;
+    }
+  }
+}
+
+@layer components {
+  .site-nav-link {
+    @apply inline-flex items-center min-h-11 text-sm text-text hover:text-gold-text;
+  }
+  .site-shell h1,
+  .site-shell h2,
+  .site-shell h3 {
+    text-wrap: balance;
+  }
+  .site-shell input,
+  .site-shell textarea {
+    caret-color: var(--gold-text);
+  }
+}
+
+@layer components {
+  .site-skip-link {
+    @apply fixed left-4 top-4 z-50 bg-gold-strong text-sm font-semibold text-button-ink;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .site-skip-link:focus {
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.25rem;
+    overflow: visible;
+    clip-path: none;
+  }
+  .site-shell :where(a, button, summary):focus-visible {
+    outline: 2px solid var(--gold-text);
+    outline-offset: 5px;
+  }
+  .site-shell :where(p, figcaption) {
+    text-wrap: pretty;
+  }
+  .site-shell :where(section[id], footer[id]) {
+    scroll-margin-top: 104px;
+  }
+  .site-text-link {
+    @apply inline-flex min-h-11 items-center gap-3 text-sm text-text underline underline-offset-4 decoration-border hover:decoration-gold;
+  }
+  .site-text-link svg {
+    @apply shrink-0;
+  }
+  .site-header .site-brand > span:first-child {
+    @apply text-3xl;
+  }
+  .site-header .site-brand > span:last-child {
+    @apply mt-1;
+  }
+  .site-mobile-menu > summary {
+    @apply flex min-h-11 items-center gap-2;
+    list-style: none;
+  }
+  .site-mobile-menu > summary::-webkit-details-marker {
+    display: none;
+  }
+  .site-menu-icon {
+    @apply flex w-4 flex-col gap-1;
+  }
+  .site-menu-icon > span {
+    @apply block h-px w-full bg-text;
+    transition: transform 160ms ease-out;
+  }
+  .site-mobile-menu[open] .site-menu-icon > span:first-child {
+    transform: translateY(2.5px) rotate(45deg);
+  }
+  .site-mobile-menu[open] .site-menu-icon > span:last-child {
+    transform: translateY(-2.5px) rotate(-45deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu-icon > span {
+      transition: none;
+    }
+  }
+}

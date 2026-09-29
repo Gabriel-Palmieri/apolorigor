@@ -1,0 +1,214 @@
+@layer components {
+  .fitting-page {
+    @apply py-10 desktop:py-14;
+  }
+  .fitting-header {
+    @apply mb-8 flex flex-wrap items-end justify-between gap-6;
+  }
+  .fitting-header h1 {
+    font-size: clamp(2.25rem, 4.5vw, 4rem);
+    line-height: 1.12;
+  }
+  .fitting-header p {
+    @apply mt-5 mb-0 text-base leading-relaxed text-text-sub;
+    max-width: 55ch;
+  }
+  .fitting-text-link {
+    @apply inline-flex min-h-11 items-center text-sm font-semibold text-gold-text underline underline-offset-4;
+  }
+  .fitting-demo-note {
+    @apply mb-8 mt-0 text-sm leading-relaxed text-text-sub;
+  }
+  .fitting-workspace {
+    @apply grid items-start gap-10;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fitting-section-heading {
+    @apply mb-4 flex flex-wrap items-baseline justify-between gap-2;
+  }
+  .fitting-section-heading h2 {
+    @apply m-0 font-display text-2xl font-medium text-text;
+  }
+  .fitting-section-heading > span {
+    @apply text-sm text-text-sub;
+  }
+  .fitting-mirror {
+    @apply relative flex items-center justify-center overflow-hidden border border-border bg-bg-elevated;
+    aspect-ratio: 4 / 5;
+  }
+  .fitting-mirror-live {
+    @apply bg-sidebar;
+  }
+  .fitting-photo-empty {
+    @apply p-8 text-center;
+  }
+  .fitting-camera-icon {
+    @apply mx-auto text-gold-text;
+    width: 40px;
+    height: 40px;
+  }
+  .fitting-photo-empty p {
+    @apply mt-6 mb-4 font-display font-medium text-text;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.2;
+  }
+  .fitting-photo-empty > span {
+    @apply text-sm leading-relaxed text-text-sub;
+  }
+  .fitting-person-photo,
+  .fitting-video {
+    @apply absolute inset-0 h-full w-full object-contain;
+  }
+  .fitting-video-mirrored {
+    transform: scaleX(-1);
+  }
+  .fitting-camera-guides {
+    @apply pointer-events-none absolute inset-10 flex flex-col justify-between;
+  }
+  .fitting-camera-guides span {
+    @apply h-8 border-paper;
+    border-left-width: 1px;
+    border-right-width: 1px;
+  }
+  .fitting-camera-guides span:first-child {
+    border-top-width: 1px;
+  }
+  .fitting-camera-guides span:last-child {
+    border-bottom-width: 1px;
+  }
+  .fitting-camera-notice {
+    @apply absolute inset-x-6 m-0 bg-card p-5 text-center text-sm text-text;
+  }
+  .fitting-camera-notice span {
+    @apply inline-block mt-2 text-text-sub;
+  }
+  .fitting-camera-caption {
+    @apply absolute bottom-4 bg-sidebar px-3 py-2 text-xs text-sidebar-text;
+  }
+  .fitting-photo-actions {
+    @apply mt-4 flex flex-wrap items-center gap-3;
+  }
+  .fitting-photo-actions button {
+    @apply min-h-11;
+  }
+  .fitting-text-button {
+    @apply min-h-11 px-2 text-sm font-semibold text-gold-text underline underline-offset-4 disabled:opacity-50;
+  }
+  .fitting-photo-footnote {
+    @apply mt-4 mb-0 text-sm leading-relaxed text-text-sub;
+    max-width: 48ch;
+  }
+  .fitting-error {
+    @apply my-4 text-sm font-medium leading-relaxed text-gold-text;
+  }
+  .fitting-selection {
+    @apply min-w-0;
+  }
+  .fitting-garments {
+    @apply grid grid-cols-2 gap-x-4 gap-y-6;
+  }
+  .fitting-garment {
+    @apply min-w-0 bg-transparent p-0 text-left text-text;
+  }
+  .fitting-garment-image {
+    @apply relative block overflow-hidden border border-transparent bg-bg-elevated;
+  }
+  .fitting-garment-image img {
+    @apply block w-full object-cover;
+    aspect-ratio: 4 / 5;
+  }
+  .fitting-garment:hover .fitting-garment-image {
+    @apply border-border;
+  }
+  .fitting-garment-selected .fitting-garment-image {
+    @apply border-gold;
+  }
+  .fitting-garment-check {
+    @apply absolute bottom-2 right-2 flex size-7 items-center justify-center rounded-full bg-gold-strong text-button-ink;
+  }
+  .fitting-garment-check svg {
+    @apply size-4;
+  }
+  .fitting-garment-name {
+    @apply mt-3 block text-sm font-semibold leading-snug;
+  }
+  .fitting-garment-detail {
+    @apply mt-1 block text-xs leading-relaxed text-text-sub;
+  }
+  .fitting-review {
+    @apply mt-8 border-t border-border pt-6;
+  }
+  .fitting-review p {
+    @apply mt-0 mb-5;
+  }
+  .fitting-review p span {
+    @apply mb-1 block text-sm text-text-sub;
+  }
+  .fitting-review p strong {
+    @apply font-display text-2xl font-medium;
+  }
+  .fitting-review > button {
+    @apply min-h-12 w-full;
+  }
+  .fitting-review > span {
+    @apply mt-3 block text-center text-sm text-text-sub;
+  }
+  .fitting-tips {
+    @apply mt-10 border-t border-border pt-5 text-sm text-text-sub;
+  }
+  .fitting-tips summary {
+    @apply flex min-h-11 cursor-pointer items-center font-semibold text-text;
+    list-style: revert;
+  }
+  .fitting-tips p {
+    @apply max-w-measure leading-relaxed;
+  }
+  .fitting-preview-intro {
+    @apply mb-8;
+  }
+  .fitting-preview-intro h2 {
+    @apply m-0 font-display text-3xl font-medium text-text;
+  }
+  .fitting-preview-intro p {
+    @apply mt-4 mb-0 max-w-measure text-sm leading-relaxed text-text-sub;
+  }
+  .fitting-preview-pair {
+    @apply grid grid-cols-2 gap-4 desktop:gap-8;
+  }
+  .fitting-preview-pair figure {
+    @apply m-0 min-w-0;
+  }
+  .fitting-preview-pair img {
+    @apply block w-full bg-bg-elevated object-contain;
+    aspect-ratio: 4 / 5;
+    max-height: 640px;
+  }
+  .fitting-preview-pair figcaption {
+    @apply mt-4 text-sm font-semibold leading-relaxed;
+  }
+  .fitting-preview-pair figcaption span {
+    @apply mt-1 block text-xs font-normal text-text-sub;
+  }
+  .fitting-preview-actions {
+    @apply mt-8 flex flex-wrap items-center gap-6;
+  }
+  .fitting-empty {
+    @apply py-12;
+  }
+  .fitting-empty h2 {
+    @apply font-display text-3xl font-medium;
+  }
+  @media (min-width: 901px) {
+    .fitting-workspace {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 64px;
+    }
+    .fitting-photo {
+      position: sticky;
+      top: 120px;
+    }
+    .fitting-garments {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}

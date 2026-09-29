@@ -1,0 +1,148 @@
+
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--gold-dim);
+  color: var(--gold-strong);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 0;
+  border: 3px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dim);
+}
+
+/* ── Apollo Rigor — Light (padrão, referência da identidade da marca) ──
+   Papel de musselina + tinta de lã prensada + latão envelhecido reservado. */
+:root,
+[data-theme="light"] {
+  --bg: #ece7da;
+  --bg-elevated: #f5f1e7;
+  --card: #fcfbf6;
+  --sidebar: #171a1e;
+  --sidebar-text: #e7e3d7;
+  --input-bg: #f5f1e7;
+  --border: #dbd3bf;
+  --border-soft: #e6decc;
+
+  --gold: #8f7231;
+  --gold-dim: #e9dfc3;
+  --gold-text: #77601f;
+  --gold-strong: #574616;
+
+  --text: #201d16;
+  --text-sub: #6b6453;
+  --text-muted: #a79d84;
+
+  --button-ink: var(--paper);
+  --accent-ink: #1b1710;
+  --paper: #f4efe3;
+
+  --shadow: 0 12px 34px rgba(28, 24, 16, 0.1);
+
+  --status-green-bg: #e4f1e6;
+  --status-green-fg: #1e7a45;
+  --status-green-border: #1e7a4530;
+  --status-orange-bg: #f8ecd7;
+  --status-orange-fg: #a8631a;
+  --status-orange-border: #a8631a30;
+  --status-yellow-bg: #f7efc9;
+  --status-yellow-fg: #8e7008;
+  --status-yellow-border: #8e700830;
+  --status-red-bg: #f7e4e0;
+  --status-red-fg: #b93a2f;
+  --status-red-border: #b93a2f30;
+  --status-grey-bg: #ebe6da;
+  --status-grey-fg: #6b6453;
+  --status-grey-border: #6b645330;
+  --status-blue-bg: #e1eaf4;
+  --status-blue-fg: #29588f;
+  --status-blue-border: #29588f30;
+}
+
+/* ── Apollo Rigor — Dark ── */
+[data-theme="dark"] {
+  --bg: #13151a;
+  --bg-elevated: #191c22;
+  --card: #1c1f26;
+  --sidebar: #0f1114;
+  --sidebar-text: #e7e3d7;
+  --input-bg: #0f1114;
+  --border: #2e323c;
+  --border-soft: #23262e;
+
+  --gold: #c6a05b;
+  --gold-dim: #40391f;
+  --gold-text: #e1c588;
+  --gold-strong: #e1c588;
+
+  --text: #e8e4d7;
+  --text-sub: #aba491;
+  --text-muted: #7e7767;
+
+  --button-ink: var(--accent-ink);
+  --accent-ink: #16130d;
+  --paper: #f4efe3;
+
+  --shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
+
+  --status-green-bg: #0e2117;
+  --status-green-fg: #57d98a;
+  --status-green-border: #57d98a2a;
+  --status-orange-bg: #24160a;
+  --status-orange-fg: #f0a857;
+  --status-orange-border: #f0a8572a;
+  --status-yellow-bg: #221e0a;
+  --status-yellow-fg: #ead25e;
+  --status-yellow-border: #ead25e2a;
+  --status-red-bg: #2a0f0d;
+  --status-red-fg: #ef6b5f;
+  --status-red-border: #ef6b5f2a;
+  --status-grey-bg: #1e212a;
+  --status-grey-fg: #9a98a8;
+  --status-grey-border: #9a98a82a;
+  --status-blue-bg: #0e1a26;
+  --status-blue-fg: #6fadee;
+  --status-blue-border: #6fadee2a;
+}
+
+:root {
+  --font-display: "Bodoni Moda", Georgia, "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --radius: 8px;
+  --radius-sm: 5px;
+}
+
+/* números e dados operacionais em algarismos tabulares */
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

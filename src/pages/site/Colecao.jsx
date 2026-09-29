@@ -1,12 +1,12 @@
-import { Section, Wrap } from "../../layouts/Content.jsx";
-import { Display, Lead } from "../../shared/ui/Typography.jsx";
+import { Section, Wrap } from "../../shared/ui/estrutura/EstruturaConteudo.jsx";
+import { Display, Lead } from "../../shared/ui/estrutura/Typography.jsx";
 import { cn } from "../../shared/lib/cn.js";
-import ProdutoCard from "../../features/catalog/ProdutoCard.jsx";
+import CartaoProdutoVitrine from "../../features/catalogo/CartaoProdutoVitrine.jsx";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { useCatalogo } from "../../data/useData.js";
 import { useEffect, useMemo } from "react";
-import { VITRINES } from "../../features/catalog/siteData.js";
-import { CATEGORIAS } from "../../domain/catalog.js";
+import { VITRINES } from "../../domain/vitrine.js";
+import { CATEGORIAS } from "../../domain/catalogo.js";
 export default function Colecao() {
   const CATALOGO = useCatalogo();
   const { openProduto } = useOutletContext();
@@ -46,11 +46,11 @@ export default function Colecao() {
     <Section className="collection-page pt-10 desktop:pt-16">
       <Wrap>
         <div className="collection-page-heading">
-        <Display>A coleção.</Display>
-        <Lead className="max-w-measure">
-          Todos os modelos saem com prova e ajuste de ateliê. Escolha um traje
-          para ver tamanhos, valores e abrir o pedido.
-        </Lead>
+          <Display>A coleção.</Display>
+          <Lead className="max-w-measure">
+            Todos os modelos saem com prova e ajuste de ateliê. Escolha um traje
+            para ver tamanhos, valores e abrir o pedido.
+          </Lead>
         </div>
 
         <div className="collection-tabs" role="group" aria-label="Ocasião">
@@ -69,10 +69,12 @@ export default function Colecao() {
           ))}
         </div>
 
-        <div className="collection-categories" role="group" aria-label="Categoria">
-          <span className="text-sm text-text-sub">
-            Categoria
-          </span>
+        <div
+          className="collection-categories"
+          role="group"
+          aria-label="Categoria"
+        >
+          <span className="text-sm text-text-sub">Categoria</span>
           <button
             aria-pressed={categoria === ""}
             onClick={() => setCategoria("")}
@@ -92,7 +94,9 @@ export default function Colecao() {
           ))}
         </div>
 
-        <p className="mt-8 mb-6 text-sm text-text-sub" role="status">{lista.length} {lista.length === 1 ? "modelo" : "modelos"}</p>
+        <p className="mt-8 mb-6 text-sm text-text-sub" role="status">
+          {lista.length} {lista.length === 1 ? "modelo" : "modelos"}
+        </p>
 
         {lista.length === 0 ? (
           <p className="text-text-sub text-sm py-10 px-0">
@@ -109,7 +113,11 @@ export default function Colecao() {
         ) : (
           <div className="collection-grid">
             {lista.map((p) => (
-              <ProdutoCard key={p.id} produto={p} onOpen={openProduto} />
+              <CartaoProdutoVitrine
+                key={p.id}
+                produto={p}
+                onOpen={openProduto}
+              />
             ))}
           </div>
         )}

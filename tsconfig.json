@@ -10,7 +10,6 @@
   },
   "include": [
     "src/domain/types.d.ts",
-    "src/domain/statuses.js",
-    "src/shared/ui/status.js"
+    "src/shared/ui/feedback/status.js"
   ]
 }

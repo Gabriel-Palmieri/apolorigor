@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { installApi } from '../helpers/api.js';
+test.beforeEach(async ({ page }) => { await installApi(page); });
 test.use({ launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] } });
 
 const upload = page => page.getByLabel('Enviar sua foto');
@@ -20,14 +22,14 @@ test('home section and navigation open the fitting room with no automatic camera
 });
 
 test('upload, suit selection and honest demo preview work without persisting the photo', async ({ page }) => {
-  await page.goto('/provador?modelo=2');
-  await expect(page.getByRole('button', { name: /Smoking Black Tie/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.goto('/provador?modelo=10000000-0000-4000-8000-000000000001');
+  await expect(page.getByRole('button', { name: /Terno Oxford/ })).toHaveAttribute('aria-pressed', 'true');
   await page.reload();
-  await expect(page.getByRole('button', { name: /Smoking Black Tie/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /Terno Oxford/ })).toHaveAttribute('aria-pressed', 'true');
   await upload(page).setInputFiles(foto);
   await expect(page.getByAltText('Sua foto escolhida para a prova')).toBeVisible();
-  await page.getByRole('button', { name: /Terno Casamento Marfim/ }).click();
-  await expect(page).toHaveURL(/modelo=3/);
+  await page.getByRole('button', { name: /Terno Oxford/ }).click();
+  await expect(page).toHaveURL(/modelo=10000000/);
   await page.getByRole('button', { name: 'Ver prévia de demonstração' }).click();
   await expect(page.getByRole('heading', { name: 'Sua escolha, lado a lado.' })).toBeFocused();
   await expect(page.getByText(/o terno não foi aplicado/)).toBeVisible();
@@ -55,9 +57,9 @@ test('unsupported and unreadable uploads explain recovery, and a valid upload cl
 test('invalid suit links and an empty collection have useful states', async ({ page }) => {
   await page.goto('/provador?modelo=999999');
   await expect(page.getByText('Este modelo não está mais na coleção. Escolha outro terno abaixo.')).toBeVisible();
-  await page.getByRole('button', { name: /Smoking Black Tie/ }).click();
-  await expect(page).toHaveURL(/modelo=2/);
-  await page.evaluate(() => localStorage.setItem('apollo-data-v1', JSON.stringify({ produtos: [], trans: [], ajustes: [], pedidos: [] })));
+  await page.getByRole('button', { name: /Terno Oxford/ }).click();
+  await expect(page).toHaveURL(/modelo=10000000/);
+  await page.route("**/api/products?*", route => route.fulfill({ json: [] }));
   await page.reload();
   await expect(page.getByRole('heading', { name: 'A coleção está sendo preparada.' })).toBeVisible();
 });
@@ -66,7 +68,7 @@ test('fitting room and home invitation fit mobile and desktop in both themes', a
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     for (const theme of ['light', 'dark']) {
-      await page.goto('/provador?modelo=2');
+      await page.goto('/provador?modelo=10000000-0000-4000-8000-000000000001');
       await page.evaluate(value => localStorage.setItem('apollo-theme', value), theme);
       await page.reload();
       await expect(page.getByRole('heading', { name: /O seu próximo traje/ })).toBeVisible();
@@ -105,7 +107,8 @@ test.describe('camera lifecycle', () => {
     await page.getByRole('button', { name: 'Tirar outra foto' }).click();
     await expect(page.getByRole('button', { name: 'Tirar foto', exact: true })).toBeEnabled({ timeout: 15000 });
     await page.getByRole('link', { name: 'Ver a coleção', exact: true }).click();
-    expect(await page.evaluate(() => window.cameraAudit.stops)).toBe(2);
+    await expect(page).toHaveURL(/\/colecao$/);
+    await expect.poll(() => page.evaluate(() => window.cameraAudit.stops)).toBe(2);
   });
   test('camera granted after cancellation is immediately released', async ({ page }) => {
     await page.addInitScript(() => {

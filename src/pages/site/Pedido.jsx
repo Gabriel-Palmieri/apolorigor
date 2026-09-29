@@ -1,13 +1,13 @@
 import PedidoCheckout from "../../features/pedidos/PedidoCheckout.jsx";
 import { usePedidoForm } from "../../features/pedidos/usePedidoForm.js";
-import { Section, Wrap } from "../../layouts/Content.jsx";
-import { H2, Lead } from "../../shared/ui/Typography.jsx";
-import { Button } from "../../shared/ui/Button.jsx";
+import { Section, Wrap } from "../../shared/ui/estrutura/EstruturaConteudo.jsx";
+import { H2, Lead } from "../../shared/ui/estrutura/Typography.jsx";
+import { Button } from "../../shared/ui/botoes/Button.jsx";
 import { useOutletContext } from "react-router-dom";
 import Confirmacao from "../../features/pedidos/Confirmacao.jsx";
 export default function Pedido() {
   const { rascunho, go, cliente } = useOutletContext();
-  const { form, erros, feito, set, enviar, r } = usePedidoForm(
+  const { form, erros, feito, busy, set, enviar, r } = usePedidoForm(
     cliente,
     rascunho,
   );
@@ -43,6 +43,7 @@ export default function Pedido() {
     <PedidoCheckout
       form={form}
       erros={erros}
+      busy={busy}
       set={set}
       enviar={enviar}
       r={r}

@@ -1,32 +1,6 @@
-import PacoteSolicitacao from "../../features/pedidos/PacoteSolicitacao.jsx";
-import { usePacoteForm } from "../../features/pedidos/usePacoteForm.js";
-import { useOutletContext } from "react-router-dom";
-import Confirmacao from "../../features/pedidos/Confirmacao.jsx";
-// modelos que fazem sentido como base de um pacote (ternos)
-
+import { Section, Wrap } from "../../shared/ui/estrutura/EstruturaConteudo.jsx";
+import { H2, Lead } from "../../shared/ui/estrutura/Typography.jsx";
+import { Link } from "react-router-dom";
 export default function Pacote() {
-  const { go, cliente } = useOutletContext();
-  const { form, erros, feito, set, enviar, modelo, estimativa, MODELOS_BASE } =
-    usePacoteForm(cliente);
-  if (feito) {
-    return (
-      <Confirmacao
-        pedido={feito}
-        go={go}
-        resumo={`${feito.noivos} · ${feito.nIntegrantes} integrantes`}
-      />
-    );
-  }
-  return (
-    <PacoteSolicitacao
-      form={form}
-      erros={erros}
-      set={set}
-      enviar={enviar}
-      modelo={modelo}
-      estimativa={estimativa}
-      MODELOS_BASE={MODELOS_BASE}
-      go={go}
-    />
-  );
+  return <Section><Wrap narrow><H2>Trajes para o seu casamento.</H2><Lead className="mt-4">A contratação de pacotes para grupos ainda não está disponível por aqui. Você pode solicitar um traje por pedido na coleção.</Lead><Link to="/colecao" className="inline-block mt-6 text-gold-text underline">Explorar a coleção</Link></Wrap></Section>;
 }

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { installApi } from '../helpers/api.js';
 
 async function checkManagementTypographyAndColors(page, scope) {
   await page.evaluate(() => document.fonts.ready);
@@ -27,6 +28,7 @@ async function checkManagementTypographyAndColors(page, scope) {
 
 for (const theme of ['light', 'dark']) {
   test(`all management pages and a portaled dialog use Manrope and brand tones in ${theme}`, async ({ page }) => {
+    await installApi(page, { role: "ADMIN" });
     await page.addInitScript(value => localStorage.setItem('apollo-theme', value), theme);
     for (const route of ['dashboard', 'pedidos', 'estoque', 'locacoes', 'anuario', 'ajustes']) {
       await page.goto('/sistema/' + route);
@@ -34,9 +36,9 @@ for (const theme of ['light', 'dark']) {
       await expect(page.getByText('Carregando página…', { exact: true })).toHaveCount(0);
       await checkManagementTypographyAndColors(page, page.locator('.erp-shell'));
     }
-    await page.goto('/sistema/locacoes?aba=pacotes&pacote=11');
-    await page.getByRole('button', { name: '+ Adicionar participante', exact: true }).click();
-    const dialog = page.getByRole('dialog', { name: 'Adicionar participante', exact: true });
+    await page.goto('/sistema/estoque');
+    await page.getByRole('button', { name: /Terno Oxford/ }).click();
+    const dialog = page.getByRole('dialog', { name: 'Editar modelo', exact: true });
     await expect(dialog).toBeVisible();
     await checkManagementTypographyAndColors(page, dialog);
     await page.keyboard.press('Escape');

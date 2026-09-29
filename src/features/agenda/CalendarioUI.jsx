@@ -1,9 +1,15 @@
-import { TickRule } from "../../shared/ui/Tape.jsx";
+import { TickRule } from "../../shared/ui/estrutura/Tape.jsx";
 import { cn } from "../../shared/lib/cn.js";
-import { colorClass, C, toneAppearance } from "../../shared/ui/palette.js";
-import { ProgressFill } from "../../shared/ui/Progress.jsx";
+import { aparenciaTom } from "../../shared/ui/feedback/aparencia.js";
+import { ProgressFill } from "../../shared/ui/feedback/Progress.jsx";
 function capacityAppearance(n, cap) {
-  if (!n) return { bg: C.card, border: C.border, accent: C.textSub };
+  if (!n)
+    return {
+      bg: "bg-card",
+      border: "border-border",
+      textClassName: "text-text-sub",
+      markerClassName: "bg-text-sub",
+    };
   const ratio = n / cap;
   const tone =
     ratio < 0.5
@@ -13,10 +19,11 @@ function capacityAppearance(n, cap) {
         : ratio <= 1
           ? "yellow"
           : "red";
-  const appearance = toneAppearance(tone);
+  const appearance = aparenciaTom(tone);
   return {
     ...appearance,
-    accent: tone === "yellow" ? C.gold : appearance.color,
+    textClassName: tone === "yellow" ? "text-gold" : appearance.textClassName,
+    markerClassName: tone === "yellow" ? "bg-gold" : appearance.markerClassName,
   };
 }
 const linkBtn =
@@ -30,42 +37,40 @@ function CapacityBar({ n, cap, label }) {
     <div>
       <div className="flex justify-between text-micro text-text-sub mb-1">
         <span>{label}</span>
-        <span className={cn("font-bold", colorClass(h.accent, "text"))}>
+        <span className={cn("font-bold", h.textClassName)}>
           {n} / {cap}
           {n > cap ? ` · +${n - cap} acima` : ""}
         </span>
       </div>
       <div className="h-1.5 rounded-control bg-input-bg overflow-hidden">
         <ProgressFill
-          className={cn("h-full", colorClass(h.accent, "bg"))}
+          className={cn("h-full", h.markerClassName)}
           value={`${pct}%`}
         />
       </div>
     </div>
   );
 }
-const LegendSwatch = ({ c, t }) => (
+const LegendSwatch = ({ className, t }) => (
   <span className="flex items-center gap-1">
-    <span
-      className={cn(
-        "w-2 h-2 rounded-control inline-block",
-        colorClass(c, "bg"),
-      )}
-    />
+    <span className={cn("w-2 h-2 rounded-control inline-block", className)} />
     {t}
   </span>
 );
-function MiniStat({ label, val, sub, color }) {
+function MiniStat({ label, val, sub, textClassName }) {
   return (
     <div className="bg-card border border-border rounded-card pt-3 px-3.5 pb-3.5">
-      <TickRule color={color} className="h-1.5 mb-2.5 opacity-70" />
+      <TickRule
+        textClassName={textClassName}
+        className="h-1.5 mb-2.5 opacity-70"
+      />
       <p className="text-micro text-text-sub mt-0 mx-0 mb-1.5 font-semibold tracking-widest font-mono tabular-nums uppercase">
         {label}
       </p>
       <p
         className={cn(
           "text-2xl font-medium m-0 font-mono tabular-nums leading-none",
-          colorClass(color, "text"),
+          textClassName,
         )}
       >
         {val}

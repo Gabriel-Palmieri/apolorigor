@@ -1,47 +1,50 @@
-import { test, expect } from '@playwright/test';
-
-test('a purchase validates contact details, sends the selected model and persists the request', async ({ page }) => {
-  const errors = [];
-  page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/colecao/2');
-  const dialog = page.getByRole('dialog');
-  await dialog.getByRole('button', { name: /Comprar/ }).click();
-  await dialog.getByRole('button', { name: 'M', exact: true }).click();
-  await dialog.getByRole('button', { name: 'Continuar para o pedido' }).click();
-  await expect(page).toHaveURL(/\/pedido$/);
-  await page.reload();
-  await page.getByRole('button', { name: 'Enviar pedido', exact: true }).click();
-  await expect(page.getByLabel('Nome completo')).toHaveAttribute('aria-invalid', 'true');
-  await page.getByLabel('Nome completo').fill('Cliente de teste');
-  await page.getByLabel('E-mail', { exact: true }).fill('cliente@example.com');
-  await page.getByLabel('Telefone / WhatsApp').fill('(11) 99999-0000');
-  await page.getByRole('button', { name: 'Enviar pedido', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Recebemos seu pedido.' })).toBeVisible();
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('apollo-data-v1')).pedidos.find(p => p.cliente.email === 'cliente@example.com'));
-  expect(saved).toMatchObject({ tipo: 'venda', produtoId: 2, tam: 'M', status: 'Novo' });
-  await page.goto('/sistema/pedidos');
-  await expect(page.getByRole('row').filter({ hasText: saved.protocolo })).toBeVisible();
-  expect(errors).toEqual([]);
+import { test, expect } from "@playwright/test";
+import { installApi, ids, order, transaction } from "../helpers/api.js";
+test("admin reviews and rejects requests with an explicit server reason", async ({ page }) => {
+  const state = await installApi(page, { role: "ADMIN", orders: [order()] });
+  await page.goto("/sistema/pedidos");
+  await page.getByRole("button", { name: /Abrir pedido AR-/ }).click();
+  await page.getByRole("button", { name: "Marcar em análise" }).click();
+  await expect(page.getByRole("dialog").getByText("Em análise", { exact: true }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Recusar", exact: true }).click();
+  await page.getByLabel("Motivo da recusa").fill("Modelo indisponível para a data.");
+  await page.getByRole("button", { name: "Confirmar recusa" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(state.orders[0].status).toBe("REJECTED");
+  expect(state.orders[0].rejectionReason).toBe("Modelo indisponível para a data.");
 });
-
-test('a package request preserves the chosen model, participant count and estimate', async ({ page }) => {
-  const errors = [];
-  page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/pacote');
-  await page.getByLabel('Nome dos noivos').fill('Ana & Bruno');
-  await page.getByLabel('Integrantes (trajes)').fill('6');
-  await page.getByLabel('Modelo base').selectOption('1');
-  await page.getByLabel('Nome', { exact: true }).fill('Bruno Silva');
-  await page.getByLabel('E-mail', { exact: true }).fill('bruno@example.com');
-  await page.getByLabel('Telefone / WhatsApp').fill('11999990000');
-  await page.getByRole('button', { name: 'Enviar solicitação', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Recebemos seu pedido.' })).toBeVisible();
-  const saved = await page.evaluate(() => {
-    const data = JSON.parse(localStorage.getItem('apollo-data-v1'));
-    return { pedido: data.pedidos.find(p => p.cliente.email === 'bruno@example.com'), aluguel: data.produtos.find(p => p.id === 1).aluguel };
-  });
-  expect(saved.pedido).toMatchObject({ tipo: 'locacao_padronizada', noivos: 'Ana & Bruno', nIntegrantes: 6, modeloBaseId: 1, valorEstimado: saved.aluguel * 6 });
-  expect(saved.pedido.retirada < saved.pedido.dataEvento).toBe(true);
-  expect(saved.pedido.devolucao > saved.pedido.dataEvento).toBe(true);
-  expect(errors).toEqual([]);
+test("direct sale uses registered customer, variant UUID and integer cents", async ({ page }) => {
+  const state = await installApi(page, { role: "ADMIN" });
+  await page.goto("/sistema/locacoes");
+  await page.getByRole("button", { name: "Nova operação" }).click();
+  await page.getByRole("combobox", { name: "Modalidade", exact: true }).selectOption("SALE");
+  await page.getByLabel("Cliente cadastrado").selectOption(ids.client);
+  await page.getByRole("combobox", { name: "Modelo", exact: true }).selectOption(ids.product);
+  await page.getByRole("combobox", { name: "Tamanho", exact: true }).selectOption(ids.variant);
+  await page.getByLabel("Valor em reais").fill("950.25");
+  await page.getByRole("button", { name: "Salvar rascunho" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(state.requests.find(r => r.path === "/transactions" && r.method === "POST").body).toEqual({ variantId: ids.variant, profileId: ids.client, type: "SALE", priceCents: 95025 });
+  await page.getByRole("button", { name: "Confirmar operação" }).click();
+  await page.getByRole("button", { name: "Registrar entrega" }).click();
+  await expect(page.getByText("Concluído", { exact: true })).toBeVisible();
+});
+test("editing and cancelling a draft use supported transaction endpoints", async ({ page }) => {
+  const state = await installApi(page, { role: "ADMIN", transactions: [transaction({ type: "SALE", startDate: null, endDate: null })] });
+  await page.goto("/sistema/locacoes");
+  await page.getByRole("button", { name: "Editar rascunho" }).click();
+  await page.getByLabel("Valor em reais").fill("1000.01");
+  await page.getByRole("button", { name: "Salvar rascunho" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  expect(state.requests.find(r => r.method === "PATCH" && r.path.startsWith("/transactions/")).body.priceCents).toBe(100001);
+  page.once("dialog", dialog => dialog.accept());
+  await page.getByRole("button", { name: "Cancelar operação" }).click();
+  await expect(page.getByText("Cancelado", { exact: true })).toBeVisible();
+});
+test("the returns page reads API transactions and does not mount the old tailoring board", async ({ page }) => {
+  await installApi(page, { role: "ADMIN", transactions: [transaction({ status: "CONFIRMED", pickedUpAt: "2026-10-15T12:00:00Z" })] });
+  await page.goto("/sistema/ajustes");
+  await expect(page.getByText(/O acompanhamento de costura ainda não está disponível/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Registrar devolução" })).toBeVisible();
+  await expect(page.locator(".atelier-board")).toHaveCount(0);
 });

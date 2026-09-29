@@ -1,0 +1,254 @@
+@layer components {
+  .home-fitting-section {
+    @apply bg-bg-elevated;
+  }
+  .home-fitting-layout {
+    @apply grid items-center gap-10 desktop:gap-16;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-fitting-photo {
+    @apply m-0;
+  }
+  .home-fitting-photo > img {
+    @apply block w-full object-cover;
+    aspect-ratio: 4 / 5;
+    max-height: 600px;
+  }
+  .home-fitting-photo figcaption {
+    @apply mt-4 flex flex-wrap justify-between gap-2 text-sm text-text-sub;
+  }
+  .home-fitting-copy {
+    @apply max-w-xl;
+  }
+  .home-fitting-description {
+    @apply mt-5 mb-8 text-base leading-relaxed text-text-sub;
+    max-width: 42ch;
+  }
+  .home-fitting-demo {
+    @apply mt-4 mb-0 text-sm leading-relaxed text-text-sub;
+  }
+  .home-fitting-photo-empty {
+    @apply flex items-center justify-center font-display text-4xl text-text-sub;
+    aspect-ratio: 4 / 5;
+  }
+  @media (min-width: 901px) {
+    .home-fitting-layout {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    }
+  }
+}
+
+@layer components {
+  .home-page .home-hero {
+    padding-block: clamp(2rem, 4vw, 4rem) 1.5rem;
+  }
+  .home-hero-layout {
+    @apply grid gap-8 desktop:gap-10;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-hero-copy {
+    @apply flex flex-col justify-center;
+  }
+  .home-hero .home-hero-title {
+    font-size: clamp(3.5rem, 6.6vw, 6rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+  .home-hero-description {
+    @apply mt-6 mb-0 text-base leading-relaxed text-text-sub;
+  }
+  .home-hero-actions {
+    @apply mt-8 flex flex-wrap items-center gap-x-6 gap-y-2;
+  }
+  .home-hero-actions > button {
+    @apply min-h-12;
+  }
+  .home-hero-audience {
+    @apply mt-10 mb-0 text-sm leading-relaxed text-text-sub;
+  }
+  .home-hero-gallery {
+    @apply grid min-w-0 items-start gap-4;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  }
+  .home-hero-gallery figure {
+    @apply m-0 min-w-0;
+  }
+  .home-hero-primary {
+    @apply self-start;
+  }
+  .home-hero-secondary {
+    padding-top: 112px;
+  }
+  .home-hero-image {
+    @apply relative block bg-bg-elevated;
+    overflow: hidden;
+  }
+  .home-hero-image img {
+    @apply block w-full object-cover;
+    aspect-ratio: 3 / 4;
+  }
+  .home-hero-primary img {
+    aspect-ratio: 3 / 4;
+  }
+  .home-hero-secondary img {
+    aspect-ratio: 3 / 4;
+    object-position: 48% center;
+  }
+  .home-hero-gallery figcaption {
+    @apply flex flex-col gap-1 pt-3 text-sm leading-snug text-text;
+  }
+  .home-hero-gallery figcaption > span:last-child {
+    @apply text-xs text-text-sub;
+  }
+  .home-hero-footnote {
+    @apply mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b border-border pb-5 text-sm text-text-sub;
+  }
+  .home-wedding-section {
+    @apply bg-bg;
+  }
+  .home-fitting-copy h2 {
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    line-height: 1.12;
+  }
+
+  @media (min-width: 901px) {
+    .home-hero-layout {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
+    }
+    .home-hero-copy {
+      padding-block: 32px;
+    }
+    .home-hero-audience {
+      margin-top: 64px;
+    }
+    .home-hero-gallery {
+      padding-top: 0;
+    }
+    .home-hero-primary img {
+      height: clamp(440px, 38vw, 540px);
+      aspect-ratio: auto;
+    }
+    .home-hero-secondary {
+      padding-top: 128px;
+      padding-bottom: 0;
+    }
+  }
+  @media (min-width: 621px) and (max-width: 900px) {
+    .home-hero-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+    }
+    .home-hero-gallery {
+      grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+    }
+    .home-hero-secondary {
+      padding-top: 72px;
+    }
+    .home-hero .home-hero-title {
+      font-size: 3.75rem;
+    }
+    .home-hero-audience {
+      margin-top: 24px;
+    }
+  }
+  @media (max-width: 620px) {
+    .home-hero-audience {
+      display: none;
+    }
+    .home-hero-title br {
+      display: none;
+    }
+    .home-hero-title {
+      max-width: 9ch;
+    }
+    .home-hero-description {
+      margin-top: 20px;
+    }
+    .home-hero-actions {
+      margin-top: 24px;
+    }
+    .home-hero-primary img {
+      aspect-ratio: 3 / 4;
+    }
+    .home-hero-secondary {
+      padding-top: 64px;
+    }
+    .home-hero-gallery {
+      gap: 12px;
+    }
+    .home-hero-gallery figcaption {
+      font-size: 0.8rem;
+    }
+    .home-hero-gallery figcaption > span:last-child {
+      font-size: 0.75rem;
+    }
+    .home-hero-footnote {
+      margin-top: 20px;
+    }
+    .home-fitting-photo figcaption > span {
+      display: none;
+    }
+  }
+}
+
+@keyframes home-arrive {
+  from {
+    opacity: 0.6;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-page .home-hero-copy > div {
+    animation: home-arrive 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .home-page .home-hero-gallery {
+    animation: home-arrive 700ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+  }
+  .home-page
+    :where(
+      .home-hero-actions > button,
+      .home-fitting-copy > button,
+      .home-wedding-section button,
+      .collection-intro button
+    ) {
+    transition:
+      transform 180ms ease-out,
+      background-color 180ms ease-out,
+      border-color 180ms ease-out;
+  }
+  .home-page
+    :where(
+      .home-hero-actions > button,
+      .home-fitting-copy > button,
+      .home-wedding-section button,
+      .collection-intro button
+    ):active {
+    transform: scale(0.98);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .home-page
+      :where(
+        .home-hero-actions > button,
+        .home-fitting-copy > button,
+        .home-wedding-section button,
+        .collection-intro button
+      ):hover {
+      transform: translateY(-2px);
+    }
+    .home-page .home-hero-image {
+      overflow: hidden;
+    }
+    .home-page :where(.product-card-photo, .home-hero-image) > img {
+      transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .home-page .product-card:hover .product-card-photo > img,
+    .home-page .home-hero-image:hover > img {
+      transform: scale(1.025);
+    }
+  }
+}

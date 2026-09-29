@@ -1,13 +1,14 @@
 import { test, expect } from '@playwright/test';
+import { installApi } from '../helpers/api.js';
 
-const routes = ['/', '/colecao', '/provador', '/pacote', '/entrar', '/conta/perfil', '/conta/pedidos', '/casamento/11', '/sistema/dashboard', '/sistema/pedidos', '/sistema/estoque', '/sistema/locacoes', '/sistema/anuario', '/sistema/ajustes', '/sistema/locacoes?aba=pacotes&pacote=11'];
+const routes = ['/', '/colecao', '/provador', '/pacote', '/entrar', '/sistema/dashboard', '/sistema/pedidos', '/sistema/estoque', '/sistema/locacoes', '/sistema/anuario', '/sistema/ajustes', '/sistema/locacoes?aba=pacotes&pacote=11'];
 for (const width of [390, 768, 1024, 1440]) {
   test(`pages fit a ${width}px viewport in both themes`, async ({ page }) => {
     test.setTimeout(90000);
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/entrar');
-    await page.getByRole('button', { name: 'Entrar como cliente', exact: true }).click();
+    await installApi(page, { role: "ADMIN" });
+    await page.goto("/sistema/dashboard");
     for (const theme of ['light', 'dark']) {
       await page.evaluate(value => localStorage.setItem('apollo-theme', value), theme);
       for (const route of routes) {
@@ -19,8 +20,10 @@ for (const width of [390, 768, 1024, 1440]) {
         expect(overflow, `${route} in ${theme} at ${width}px`).toBeLessThanOrEqual(1);
       }
       await page.goto('/colecao');
+      await expect(page.getByRole('heading', { name: 'A coleção.' })).toBeVisible();
       await page.screenshot({ path: `.validation.local/colecao-${width}-${theme}.png` });
       await page.goto('/sistema/estoque');
+      await expect(page.getByRole('button', { name: /Terno Oxford/ })).toBeVisible();
       await page.screenshot({ path: `.validation.local/estoque-${width}-${theme}.png` });
     }
   });

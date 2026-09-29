@@ -30,13 +30,13 @@ const rules = {
       schema: [],
       messages: {
         inline:
-          "Use design-system utilities. Continuous progress is isolated in shared/ui/Progress.jsx.",
+          "Use design-system utilities. Continuous progress is isolated in shared/ui/feedback/Progress.jsx.",
       },
     },
     create(context) {
       const allowed = context.filename
         .replaceAll("\\", "/")
-        .endsWith("/shared/ui/Progress.jsx");
+        .endsWith("/shared/ui/feedback/Progress.jsx");
       return {
         JSXAttribute(node) {
           if (node.name.name === "style" && !allowed)

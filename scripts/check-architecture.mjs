@@ -26,7 +26,9 @@ for (const file of files) {
     const forbidden = {
       domain: ['app', 'layouts', 'pages', 'features', 'data', 'fixtures'],
       shared: ['app', 'layouts', 'pages', 'features', 'data', 'fixtures'],
-      features: ['pages'],
+      features: ['app', 'layouts', 'pages'],
+      data: ['app', 'layouts', 'pages', 'features', 'shared'],
+      fixtures: ['app', 'layouts', 'pages', 'features', 'data', 'shared'],
     };
     if (forbidden[from]?.includes(to)) errors.push(`${relative(file)}: dependência de ${from} para ${to}`);
     if (from === 'domain' && relative(target).startsWith('shared/ui/')) errors.push(`${relative(file)}: domínio depende de UI`);
