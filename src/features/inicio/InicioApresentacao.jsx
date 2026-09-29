@@ -62,7 +62,7 @@ export default function InicioApresentacao({ go }) {
           <div className="home-hero-gallery">
             <FotoEditorial
               primary
-              src="/produtos/terno-casamento-marfim.jpg"
+              src="/produtos/gravata-seda-bordo.jpg"
               alt="Traje marfim de cerimônia com colete e gravata borboleta"
               title="Trajes de cerimônia"
               detail="O seu momento, em cada detalhe."

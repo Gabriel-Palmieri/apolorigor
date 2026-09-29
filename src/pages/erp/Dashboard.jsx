@@ -4,6 +4,7 @@ import { resumoDashboard } from "../../domain/dashboard.js";
 import { Button } from "../../shared/ui/botoes/Button.jsx";
 import Pendencias from "../../features/dashboard/Pendencias.jsx";
 import ProximasMovimentacoes from "../../features/dashboard/ProximasMovimentacoes.jsx";
+import ResumoAcervo from "../../features/dashboard/ResumoAcervo.jsx";
 export default function Dashboard() {
   const data = useData();
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export default function Dashboard() {
         <Pendencias pendencias={pendencias} />
         <ProximasMovimentacoes eventos={proximos} hoje={hoje} />
       </div>
+      <ResumoAcervo produtos={data.produtos} trans={data.trans} />
     </div>
   );
 }

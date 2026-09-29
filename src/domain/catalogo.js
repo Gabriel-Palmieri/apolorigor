@@ -7,6 +7,21 @@ export const CATEGORIAS = [
   "Camisa",
   "Acessório",
 ];
+
+// Quantidades físicas cadastradas; disponibilidade depende de tamanho e período.
+export function resumoAcervo(produtos) {
+  return {
+    modelos: produtos.length,
+    ativos: produtos.filter((produto) => produto.ativo).length,
+    inativos: produtos.filter((produto) => !produto.ativo).length,
+    pecas: produtos.reduce(
+      (total, produto) =>
+        total +
+        produto.variantes.reduce((sum, variante) => sum + variante.qtd, 0),
+      0,
+    ),
+  };
+}
 export const COLECOES = [
   "Clássica",
   "Verão 2026",

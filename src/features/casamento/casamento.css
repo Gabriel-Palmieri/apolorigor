@@ -1,0 +1,35 @@
+@layer components {
+  .casamento-portal {
+    @apply grid gap-5;
+  }
+  .casamento-bloco {
+    @apply border border-border bg-card p-5 tablet:p-7;
+  }
+  .casamento-referencias {
+    @apply m-0 grid grid-cols-1 tablet:grid-cols-3 gap-5;
+  }
+  .casamento-referencias dt {
+    @apply text-xs text-text-sub;
+  }
+  .casamento-referencias dd {
+    @apply m-0 mt-2 text-sm text-text;
+  }
+  .casamento-modelo {
+    @apply flex flex-wrap items-center gap-5;
+  }
+  .casamento-modelo-foto {
+    @apply w-24 h-32 object-cover bg-bg-elevated shrink-0;
+  }
+  .casamento-participante {
+    @apply flex justify-between items-center gap-4 flex-wrap py-4 border-b border-border-soft last:border-0;
+  }
+  .casamento-planejamento {
+    @apply grid grid-cols-1 desktop:grid-cols-summary gap-rhythm items-start;
+  }
+  .casamento-planejamento h3 {
+    @apply mt-0 mb-5 text-lg font-medium text-text;
+  }
+  .casamento-planejamento-resumo {
+    @apply border border-border bg-card p-5 tablet:p-6 desktop:sticky desktop:top-28;
+  }
+}

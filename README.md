@@ -23,7 +23,16 @@ Aprovar um pedido cria uma transação em rascunho. Confirmar essa transação c
 
 Os pagamentos são simulados, sem cobrança financeira real. Essa condição aparece antes da confirmação na interface.
 
-Pacotes de casamento, participantes, assinaturas e ordens de costura não possuem endpoints nesta API. As páginas de casamento apresentam a indisponibilidade e direcionam para pedidos individuais. A área de retiradas e devoluções permite as operações suportadas, incluindo observações de avarias; não cria ordens de reparo locais.
+Pacotes de casamento, participantes, assinaturas e ordens de costura não possuem endpoints nesta API. Suas interfaces foram preservadas com contratação, revelação de traje, cadastro de ordens e mudanças de etapa indisponíveis. A área de retiradas e devoluções permite as operações suportadas, incluindo observações de avarias; não cria ordens de reparo locais.
+
+### Interfaces aguardando integração
+
+- Em `/pacote`, o visitante pode preparar os dados do evento, escolher uma referência do catálogo e organizar participantes. A prévia do portal mostra esse planejamento, sem contrato, reserva, pagamento ou status de retirada fictícios.
+- O planejamento usa somente estado React e é descartado ao sair da tela ou recarregar. Não é enviado à API, salvo em localStorage ou convertido em um pedido comercial. A referência de valor multiplica o preço unitário do catálogo pela quantidade prevista e não representa uma proposta de pacote.
+- Em `/casamento`, a área autenticada do casal preserva as seções de evento, roupas e grupo, com ausência de dados explicitamente indicada. O acesso aparece na conta do cliente.
+- Na gestão, `/sistema/locacoes?aba=pacotes` preserva a visão geral e o planejamento do grupo, reutilizando o mesmo formulário e portal da vitrine.
+- `/sistema/ajustes?aba=costura` preserva as colunas do painel de costura. Não há ordens demonstrativas, arraste ou gravação de etapas. A aba de retiradas e devoluções continua conectada à API.
+- O catálogo separa controles, resumo físico, listagem e edição em componentes próprios. O resumo recolhido do dashboard usa quantidades cadastradas e operações confirmadas ou concluídas; não estima disponibilidade nem apresenta o valor dessas operações como recebimento financeiro.
 
 ## Executar
 

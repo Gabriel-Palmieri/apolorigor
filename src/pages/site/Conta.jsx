@@ -18,14 +18,69 @@ export default function Conta() {
   const [error, setError] = useState("");
   const perfil = location.pathname === "/conta/perfil";
   async function logout() {
-    if (busy) return; setBusy(true); setError("");
-    try { await sair(); go("home"); } catch (err) { setError(err.message); } finally { setBusy(false); }
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await sair();
+      go("home");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
   }
   if (!sessao) return null;
-  return <Section className="pt-10 desktop:pt-16"><Wrap>
-    <div className="flex justify-between items-start gap-4 flex-wrap"><div><H2>Olá, {sessao.nome.split(" ")[0]}.</H2><Lead className="mt-3">{sessao.email}</Lead></div><Button variant="ghost" disabled={busy} onClick={logout}>{busy ? "Saindo…" : "Sair"}</Button></div>
-    {error && <Alert>{error}</Alert>}
-    <nav className="flex gap-3 flex-wrap my-8" aria-label="Área do cliente"><Button variant={perfil ? "ghost" : "solid"} onClick={() => go("conta", "pedidos")}>Pedidos</Button><Button variant={perfil ? "solid" : "ghost"} onClick={() => go("conta", "perfil")}>Meus dados</Button><Button variant="ghost" onClick={() => go("colecao")}>Novo pedido</Button></nav>
-    {perfil ? <EditarPerfil key={sessao.id} sessao={sessao} /> : <>{loading && <p role="status" className="text-text-sub">Atualizando pedidos…</p>}<MeusPedidos pedidos={pedidos} go={go} /><h3 className="mt-10 text-xl font-medium">Minhas compras e locações</h3><TransacaoLista rows={trans} /></>}
-  </Wrap></Section>;
+  return (
+    <Section className="pt-10 desktop:pt-16">
+      <Wrap>
+        <div className="flex justify-between items-start gap-4 flex-wrap">
+          <div>
+            <H2>Olá, {sessao.nome.split(" ")[0]}.</H2>
+            <Lead className="mt-3">{sessao.email}</Lead>
+          </div>
+          <Button variant="ghost" disabled={busy} onClick={logout}>
+            {busy ? "Saindo…" : "Sair"}
+          </Button>
+        </div>
+        {error && <Alert>{error}</Alert>}
+        <nav className="flex gap-3 flex-wrap my-8" aria-label="Área do cliente">
+          <Button
+            variant={perfil ? "ghost" : "solid"}
+            onClick={() => go("conta", "pedidos")}
+          >
+            Pedidos
+          </Button>
+          <Button
+            variant={perfil ? "solid" : "ghost"}
+            onClick={() => go("conta", "perfil")}
+          >
+            Meus dados
+          </Button>
+          <Button variant="ghost" onClick={() => go("casamento")}>
+            Meu casamento
+          </Button>
+          <Button variant="ghost" onClick={() => go("colecao")}>
+            Novo pedido
+          </Button>
+        </nav>
+        {perfil ? (
+          <EditarPerfil key={sessao.id} sessao={sessao} />
+        ) : (
+          <>
+            {loading && (
+              <p role="status" className="text-text-sub">
+                Atualizando pedidos…
+              </p>
+            )}
+            <MeusPedidos pedidos={pedidos} go={go} />
+            <h3 className="mt-10 text-xl font-medium">
+              Minhas compras e locações
+            </h3>
+            <TransacaoLista rows={trans} />
+          </>
+        )}
+      </Wrap>
+    </Section>
+  );
 }

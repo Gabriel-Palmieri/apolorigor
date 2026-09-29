@@ -1,0 +1,11 @@
+@layer components {
+  .atelier-board {
+    @apply grid grid-cols-1 tablet:grid-cols-3 gap-5;
+  }
+  .atelie-column {
+    @apply min-w-0 border-t border-border pt-5;
+  }
+  .atelie-column-empty {
+    @apply border border-dashed border-border bg-card p-5 min-h-36;
+  }
+}
