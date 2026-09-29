@@ -43,29 +43,25 @@ export default function Colecao() {
     ...VITRINES,
   ];
   return (
-    <Section className="pt-10 desktop:pt-16">
+    <Section className="collection-page pt-10 desktop:pt-16">
       <Wrap>
+        <div className="collection-page-heading">
         <Display>A coleção.</Display>
-        <Lead className="mt-4 max-w-measure">
+        <Lead className="max-w-measure">
           Todos os modelos saem com prova e ajuste de ateliê. Escolha um traje
           para ver tamanhos, valores e abrir o pedido.
         </Lead>
+        </div>
 
-        <div className="mt-8 mx-0 mb-2 flex flex-wrap gap-2">
+        <div className="collection-tabs" role="group" aria-label="Ocasião">
           {abas.map((a) => (
             <button
               key={a.id}
               aria-pressed={vitrine === a.id}
               onClick={() => setVitrine(a.id)}
               className={cn(
-                "min-h-11 py-2 px-3.5 rounded-control cursor-pointer font-sans text-sm",
-                vitrine === a.id ? "font-semibold" : "font-medium",
-                vitrine === a.id ? "bg-gold-dim" : "bg-transparent",
-                vitrine === a.id ? "text-gold-strong" : "text-text",
-                cn(
-                  "border",
-                  vitrine === a.id ? "border-gold" : "border-border",
-                ),
+                "collection-tab",
+                vitrine === a.id && "collection-tab-active",
               )}
             >
               {a.titulo}
@@ -73,7 +69,7 @@ export default function Colecao() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3 mt-3.5 mx-0 mb-7 flex-wrap">
+        <div className="collection-categories" role="group" aria-label="Categoria">
           <span className="text-sm text-text-sub">
             Categoria
           </span>
@@ -111,7 +107,7 @@ export default function Colecao() {
             </button>
           </p>
         ) : (
-          <div className="grid grid-cols-2 desktop:grid-cols-3 gap-x-5 gap-y-10 desktop:gap-x-8">
+          <div className="collection-grid">
             {lista.map((p) => (
               <ProdutoCard key={p.id} produto={p} onOpen={openProduto} />
             ))}

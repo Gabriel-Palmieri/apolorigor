@@ -1,21 +1,19 @@
 import { Section, Wrap } from '../../layouts/Content.jsx';
 import { H2 } from '../../shared/ui/Typography.jsx';
-import { PASSOS } from '../catalog/siteData.js';
+import { ATELIE, PASSOS } from '../catalog/siteData.js';
 
 export default function HomePassos() {
-  return <Section id="como-funciona" className="scroll-mt-24">
+  return <Section id="como-funciona" className="service-section">
     <Wrap>
-      <div className="grid desktop:grid-cols-hero gap-rhythm">
-        <div>
-          <H2 className="text-editorial">Da escolha<br />ao último ajuste.</H2>
-          <p className="mt-5 text-text-sub leading-relaxed max-w-measure">Você cuida da ocasião. O ateliê acompanha o traje, do pedido à devolução.</p>
-        </div>
-        <ol className="m-0 p-0 list-none">
-          {PASSOS.map(p => <li key={p.n} className="grid grid-cols-step gap-5 py-6 first:pt-0 border-b border-border last:border-0">
-            <span className="text-gold-text text-sm tabular-nums pt-1">{p.n}</span>
-            <div><h3 className="m-0 font-display text-2xl font-normal">{p.t}</h3><p className="mt-3 mb-0 text-sm text-text-sub leading-relaxed">{p.d}</p></div>
-          </li>)}
-        </ol>
+      <div className="service-heading">
+        <H2>Como funciona o atendimento</H2>
+        <a href={'tel:' + ATELIE.tel.replace(/\D/g, '')} className="site-text-link">Falar com o ateliê</a>
+      </div>
+      <div className="service-questions">
+        {PASSOS.map((passo, index) => <details key={passo.n} className="service-question" open={index === 0}>
+          <summary>{passo.t}<span className="service-question-toggle" aria-hidden="true" /></summary>
+          <p>{passo.d}</p>
+        </details>)}
       </div>
     </Wrap>
   </Section>;

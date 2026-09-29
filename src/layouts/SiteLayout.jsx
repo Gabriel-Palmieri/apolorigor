@@ -6,6 +6,7 @@ import { useSessao } from "../features/conta/session.js";
 import { useCatalogo } from "../data/useData.js";
 import { useSiteNavigation } from "../app/useSiteNavigation.js";
 import { SITE_PATHS } from "../app/navigation.js";
+import HomeAtelie from "../features/home/HomeAtelie.jsx";
 const DRAFT_KEY = "apollo-pedido-rascunho";
 export default function SiteLayout() {
   const location = useLocation();
@@ -54,7 +55,7 @@ export default function SiteLayout() {
     <div className="site-shell">
       <div className="site-content">
         <SiteNav view={scrollTo || view} go={go} />
-        <main id="main-content">
+        <main id="main-content" tabIndex={-1}>
           <Outlet
             context={{
               go,
@@ -65,6 +66,7 @@ export default function SiteLayout() {
             }}
           />
         </main>
+        <HomeAtelie go={go} />
       </div>
       {produtoAberto && (
         <ProdutoModal

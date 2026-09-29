@@ -5,11 +5,16 @@ import { Button } from "../../shared/ui/Button.jsx";
 import { cn } from "../../shared/lib/cn.js";
 import { AJUSTE_MAP } from "../../shared/ui/status.js";
 import { fmtDate } from "../../shared/lib/format.js";
-// ── Painel de acompanhamento do ateliê ──────────────────────
-// ── Painel de acompanhamento do ateliê ──────────────────────
+import { useRef, useState } from 'react';
+import { useAtelieDrag } from './useAtelieDrag.js';
+
 function PainelAteliê({ produtos, ajustes, setAjustes }) {
   const colunas = AJUSTE_STATUS;
-  const avancar = (id, status) =>
+  const boardRef = useRef(null);
+  const [announcement, setAnnouncement] = useState('');
+  const avancar = (id, status) => {
+    const ajuste = ajustes.find(item => item.id === id);
+    if (!ajuste || ajuste.status === status || !colunas.includes(status)) return;
     setAjustes((prev) =>
       prev.map((a) =>
         a.id === id
@@ -20,13 +25,21 @@ function PainelAteliê({ produtos, ajustes, setAjustes }) {
           : a,
       ),
     );
+    const nome = produtos.find(produto => produto.id === ajuste.produtoId)?.nome || 'Ajuste';
+    setAnnouncement(`${nome} movido para ${status}.`);
+    requestAnimationFrame(() => boardRef.current?.querySelector(`[data-ajuste-id="${id}"]`)?.focus({ preventScroll: true }));
+  };
+  const drag = useAtelieDrag(avancar);
   return (
-    <div className="grid grid-cols-1 tablet:grid-cols-3 gap-4">
+    <div ref={boardRef}>
+      <p className="mt-0 mb-4 text-xs text-text-sub">Arraste os cartões entre as etapas ou use os botões para mudar o status.</p>
+      <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
+      <div className="grid grid-cols-1 tablet:grid-cols-3 gap-4">
       {colunas.map((col) => {
         const itens = ajustes.filter((a) => a.status === col);
         const s = statusAppearance(AJUSTE_MAP, col);
         return (
-          <div key={col}>
+          <section key={col} aria-label={col} {...drag.columnProps(col)} className={cn('atelie-column', drag.dragging !== null && 'atelie-column-ready', drag.over === col && 'atelie-column-over')}>
             <div className="flex items-center gap-2 mb-3">
               <span
                 className={cn(
@@ -43,25 +56,39 @@ function PainelAteliê({ produtos, ajustes, setAjustes }) {
                 {col.toUpperCase()} ({itens.length})
               </p>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="atelie-drop-area">
               {itens.length === 0 && (
                 <Card className="p-3.5">
-                  <p className="m-0 text-xs text-text-muted">Nenhum item.</p>
+                  <p className="m-0 text-xs text-text-sub">{drag.dragging !== null ? 'Solte o cartão aqui.' : 'Nenhum item.'}</p>
                 </Card>
               )}
               {itens.map((a) => {
                 const produto = produtos.find((p) => p.id === a.produtoId);
                 return (
-                  <Card
+                  <article
                     key={a.id}
+                    data-ajuste-id={a.id}
+                    aria-label={'Ajuste de ' + (produto?.nome || 'produto')}
+                    tabIndex={-1}
+                    {...drag.cardProps(a.id)}
                     className={cn(
-                      "p-3.5",
-                      cn("border-l-4", colorClass(s.color, "border")),
+                      'atelie-drag-card',
+                      drag.dragging === a.id && 'atelie-drag-card-active',
                     )}
                   >
+                    <Card className={cn('p-3.5', 'border-l-4', colorClass(s.color, 'border'))}>
+                    <div className="flex items-start justify-between gap-2">
                     <p className="font-bold text-text text-compact mt-0 mx-0 mb-1 font-display">
                       {produto?.nome || "—"}
                     </p>
+                    <span className="atelie-drag-handle" aria-hidden="true" {...drag.touchProps(a.id)}>
+                      <svg width="16" height="20" viewBox="0 0 16 20" fill="currentColor">
+                        <circle cx="5" cy="4" r="1.25" /><circle cx="11" cy="4" r="1.25" />
+                        <circle cx="5" cy="10" r="1.25" /><circle cx="11" cy="10" r="1.25" />
+                        <circle cx="5" cy="16" r="1.25" /><circle cx="11" cy="16" r="1.25" />
+                      </svg>
+                    </span>
+                    </div>
                     <p className="text-text-sub text-xs mt-0 mx-0 mb-1.5">
                       {a.desc}
                     </p>
@@ -76,7 +103,10 @@ function PainelAteliê({ produtos, ajustes, setAjustes }) {
                       Entrega prevista:{" "}
                       <span className="text-text">{fmtDate(a.entrega)}</span>
                     </p>
-                    <div className="flex gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
+                      {col !== 'Pendente' && <Button onClick={() => avancar(a.id, col === 'Concluído' ? 'Em costura' : 'Pendente')} size="compact" variant="ghost">
+                        {col === 'Concluído' ? 'Reabrir costura' : 'Voltar para pendente'}
+                      </Button>}
                       {col === "Pendente" && (
                         <Button
                           color="var(--status-blue-fg)"
@@ -98,13 +128,15 @@ function PainelAteliê({ produtos, ajustes, setAjustes }) {
                         </Button>
                       )}
                     </div>
-                  </Card>
+                    </Card>
+                  </article>
                 );
               })}
             </div>
-          </div>
+          </section>
         );
       })}
+      </div>
     </div>
   );
 }

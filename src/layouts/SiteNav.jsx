@@ -15,8 +15,9 @@ export default function SiteNav({ view }) {
     document.addEventListener('keydown', close);
     return () => document.removeEventListener('keydown', close);
   }, []);
-  return <header className="sticky top-0 z-40 bg-bg border-b border-border-soft">
-    <div className="max-w-site mx-auto px-gutter h-20 desktop:h-24 flex items-center justify-between gap-5 site-nav-row">
+  return <header className="site-header sticky top-0 z-40 bg-bg border-b border-border-soft">
+    <a href="#main-content" className="site-skip-link">Ir para o conteúdo</a>
+    <div className="max-w-site mx-auto px-gutter h-20 flex items-center justify-between gap-5 site-nav-row">
       <Link to="/" className="site-brand" aria-label="Apollo Rigor, página inicial">
         <span className="block font-display text-3xl desktop:text-4xl text-text leading-none tracking-tight">Apollo Rigor</span>
         <span className="block text-xs text-text-sub mt-2">Ateliê de cerimônia</span>
@@ -26,7 +27,7 @@ export default function SiteNav({ view }) {
           {links.map(link => <Link key={link.key} to={siteDestination(link.key)} aria-current={view === link.key ? 'page' : undefined} className={cn('site-nav-link', view === link.key && 'text-gold-text underline underline-offset-8')}>{link.label}</Link>)}
         </div>
         <details className="site-mobile-menu" ref={menuRef}>
-          <summary>Menu</summary>
+          <summary><span className="site-menu-icon" aria-hidden="true"><span /><span /></span>Menu</summary>
           <nav aria-label="Menu do site" className="site-mobile-links">
             {[...links, { key: cliente ? 'conta' : 'entrar', label: cliente ? 'Minha conta' : 'Entrar' }].map(link => <Link key={link.key} to={siteDestination(link.key)} onClick={() => menuRef.current?.removeAttribute('open')}>{link.label}</Link>)}
           </nav>

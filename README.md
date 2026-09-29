@@ -21,6 +21,8 @@ A área de gestão concentra o trabalho diário do ateliê:
 - **Agenda:** acompanhamento dos eventos e das movimentações dos trajes.
 - **Ateliê:** controle dos ajustes, reparos e devoluções.
 
+No painel do ateliê, os cartões podem ser arrastados entre Pendente, Em costura e Concluído. No celular, a alça do cartão permite arrastar pelo toque. Os botões mantêm todas as etapas acessíveis por teclado, incluindo voltar e reabrir a costura. A mudança é salva no navegador; soltar fora de uma coluna ou cancelar o arraste mantém o status anterior.
+
 A vitrine e a gestão utilizam o mesmo catálogo, permitindo que as mudanças feitas pela equipe apareçam na experiência do cliente.
 
 ## O provador virtual
@@ -111,11 +113,13 @@ Direção escolhida pelo usuário: alfaiataria contemporânea, sóbria, fotográ
 
 ### Vitrine
 
-A fotografia do traje é o foco. A abertura apresenta modelos reais do catálogo, com acesso direto aos detalhes. Composições fotográficas amplas alternam com catálogo compacto, informações do pacote e uma sequência vertical de atendimento. As etapas têm números porque representam a ordem do processo; categorias não recebem números decorativos.
+A fotografia do traje é o foco. A abertura apresenta modelos reais do catálogo, com acesso direto aos detalhes. Composições fotográficas amplas alternam com catálogo compacto e informações do pacote. A seção de atendimento apresenta perguntas em disclosures nativos, com a primeira resposta aberta, tipografia contida e contato direto com o ateliê. Categorias e perguntas não recebem números decorativos.
+
+A abertura reúne título e ação na mesma coluna, com o smoking em fotografia principal e o traje marfim em escala secundária. No celular, texto e ações precedem as fotos. O catálogo compartilha uma grade de duas colunas no celular e três no desktop, com aluguel e compra separados visualmente. Ocasiões usam abas com sublinhado de seleção; categorias continuam como filtros independentes. O cabeçalho tem 80px, link de salto para o conteúdo e menu móvel com indicação de abertura. O contato do ateliê está no rodapé compartilhado de todas as páginas públicas.
 
 Bodoni Moda compõe títulos e marca; IBM Plex Sans organiza navegação, formulários e descrições; IBM Plex Mono fica reservada a protocolos e dados operacionais. As fontes são locais, com `font-display: swap`. Títulos equilibram a quebra de linhas, sem palavras isoladas em outra cor.
 
-As cores originais de papel, tinta e latão são preservadas. Ações principais usam o tom forte já existente para obter contraste legível, com o primeiro plano adequado a cada tema. Fotografias não recebem molduras decorativas, sombras ou animações automáticas. As superfícies usam mudanças sutis de tom; bordas separam controles e informações relacionadas.
+As cores originais de papel, tinta e latão são preservadas. Ações principais usam o tom forte já existente para obter contraste legível, com o primeiro plano adequado a cada tema. Fotografias não recebem molduras decorativas ou sombras. A home tem uma entrada breve na abertura, aparições únicas de grupos de conteúdo ao rolar e zoom discreto nas fotos ao passar o mouse. O conteúdo permanece visível sem animações; movimento reduzido desativa entradas, transições e rolagem suave programática. As superfícies usam mudanças sutis de tom; bordas separam controles e informações relacionadas.
 
 Espaçamento em múltiplos de 4px. Conteúdo limitado ao contêiner compartilhado, com respiro maior entre seções e menor entre nome, tecido e preço de um produto. Controles de navegação, filtros, tema e fechamento têm alvos de pelo menos 44px.
 
