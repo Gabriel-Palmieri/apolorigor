@@ -191,3 +191,52 @@
     }
   }
 }
+
+@layer components {
+  @media (max-width: 900px) {
+    .erp-navigation > .erp-menu-toggle {
+      @apply flex items-center gap-3 px-5 py-3;
+      min-height: 68px;
+      list-style: none;
+      touch-action: manipulation;
+    }
+    .erp-menu-toggle::-webkit-details-marker {
+      display: none;
+    }
+    .erp-menu-toggle::marker {
+      content: "";
+    }
+    .erp-menu-icon {
+      @apply flex shrink-0 items-center justify-center rounded-control bg-gold-strong text-button-ink;
+      width: 40px;
+      height: 40px;
+    }
+    .erp-menu-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .erp-menu-label {
+      @apply text-sm font-semibold text-text;
+    }
+    .erp-menu-action {
+      @apply ml-auto inline-flex shrink-0 items-center gap-2 text-sm font-medium text-gold-text;
+    }
+    .erp-menu-action svg {
+      width: 18px;
+      height: 18px;
+    }
+    .erp-navigation[open] .erp-menu-action svg {
+      transform: rotate(180deg);
+    }
+    .erp-menu-toggle:hover {
+      @apply bg-bg;
+    }
+    .erp-menu-toggle:focus-visible {
+      outline: 2px solid var(--gold-text);
+      outline-offset: -4px;
+    }
+    .erp-navigation[open] > .erp-menu-toggle {
+      @apply border-b border-border-soft;
+    }
+  }
+}

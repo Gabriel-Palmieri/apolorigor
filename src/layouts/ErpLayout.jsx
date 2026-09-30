@@ -35,7 +35,20 @@ export default function ErpLayout() {
             if (!desktop) setMenuOpen(event.currentTarget.open);
           }}
         >
-          <summary>Menu do sistema</summary>
+          <summary className="erp-menu-toggle">
+            <span className="erp-menu-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                {menuOpen ? <path d="m6 6 12 12M6 18 18 6" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
+              </svg>
+            </span>
+            <span className="erp-menu-label">Menu do sistema</span>
+            <span className="erp-menu-action">
+              {menuOpen ? "Fechar" : "Abrir"}
+              <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m5 7.5 5 5 5-5" />
+              </svg>
+            </span>
+          </summary>
           <ErpSidebar
             page={page}
             novos={novos}
