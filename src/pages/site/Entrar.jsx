@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { Section, Wrap } from "../../shared/ui/estrutura/EstruturaConteudo.jsx";
 import { H2, Lead } from "../../shared/ui/estrutura/Typography.jsx";
 import { Button } from "../../shared/ui/botoes/Button.jsx";
 import { Field, Input } from "../../shared/ui/formularios/Form.jsx";
 import { Alert } from "../../shared/ui/feedback/Feedback.jsx";
 import { login, register, recover } from "../../data/auth.js";
+import { useSessao, useEstadoSessao } from "../../features/conta/sessao.js";
 export default function Entrar() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -17,6 +18,8 @@ export default function Entrar() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const sessao = useSessao();
+  const estadoSessao = useEstadoSessao();
   const changeMode = value => { setMode(value); setError(""); setMessage(""); };
   async function submit(event) {
     event.preventDefault();
@@ -37,6 +40,10 @@ export default function Entrar() {
     } catch (err) { setError(err.message); }
     finally { setPending(false); }
   }
+  if (sessao && !estadoSessao.verified)
+    return <p role="status" className="p-8 text-text-sub">Validando sua sessão...</p>;
+  if (sessao)
+    return <Navigate to={sessao.tipo === "admin" ? "/sistema" : "/conta/pedidos"} replace />;
   return <Section className="pt-10 desktop:pt-16"><Wrap narrow className="max-w-lg">
     <H2>{mode === "register" ? "Criar conta" : mode === "recover" ? "Recuperar senha" : "Entrar"}</H2>
     <Lead className="mt-4">Seu acesso à Apollo Rigor.</Lead>

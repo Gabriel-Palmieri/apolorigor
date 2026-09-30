@@ -14,6 +14,7 @@ import IntegranteModal from "../casamento/IntegranteModal.jsx";
 import ParticipanteRow from "../casamento/ParticipanteRow.jsx";
 import PreviaPortalCasamento from "../casamento/PreviaPortalCasamento.jsx";
 import CategoriaCard from "../casamento/CategoriaCard.jsx";
+import { solicitarPacote } from "../../data/pacotes.js";
 
 export default function PacoteSolicitacao({ contato, gestao = false }) {
   const planejamento = usePacoteForm(contato);
@@ -29,22 +30,52 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
   } = planejamento;
   const [editor, setEditor] = useState(null);
   const [portalAberto, setPortalAberto] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [enviado, setEnviado] = useState(false);
+  async function enviar(event) {
+    event.preventDefault();
+    setEnviando(true);
+    setErro("");
+    try {
+      await solicitarPacote({
+        coupleNames: form.noivos.trim(),
+        ...(form.dataEvento ? { eventDate: form.dataEvento } : {}),
+        expectedMembers: Number(form.nIntegrantes),
+        ...(form.modeloBase ? { baseProductId: form.modeloBase } : {}),
+        contactName: form.contato.trim(),
+        contactEmail: form.email.trim(),
+        contactPhone: form.tel.trim(),
+        notes: form.observacoes.trim(),
+        participants: participantes.map((person) => ({
+          name: person.nome,
+          role: person.papel,
+          ...(person.tamanho ? { size: person.tamanho } : {}),
+        })),
+      });
+      setEnviado(true);
+    } catch (error) {
+      setErro(error.message);
+    } finally {
+      setEnviando(false);
+    }
+  }
   return (
     <>
       <p className="mt-0 mb-8 text-sm text-text-sub" role="status">
-        A contratação de pacotes para grupos ainda não está disponível por aqui.
-        Este planejamento permanece somente nesta tela e é descartado ao sair.
-        Nenhum pedido será enviado ou traje reservado.
+        Envie os dados para a equipe organizar o atendimento do grupo. O envio
+        não confirma preço, contrato, disponibilidade ou reserva.
       </p>
       <form
         className="casamento-planejamento"
-        onSubmit={(event) => event.preventDefault()}
+        onSubmit={enviar}
       >
         <div>
           <section className="mb-9" aria-labelledby="planejamento-evento">
             <h3 id="planejamento-evento">O evento</h3>
             <Field label="Nome dos noivos">
               <Input
+                required
                 maxLength={150}
                 value={form.noivos}
                 onChange={set("noivos")}
@@ -66,6 +97,7 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
               >
                 <Input
                   type="number"
+                  required
                   min={1}
                   max={30}
                   step={1}
@@ -100,6 +132,7 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
             <h3 id="planejamento-contato">Responsável pelo grupo</h3>
             <Field label="Nome do responsável">
               <Input
+                required
                 value={form.contato}
                 onChange={set("contato")}
                 maxLength={100}
@@ -110,6 +143,7 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
               <Field label="E-mail do responsável">
                 <Input
                   type="email"
+                  required
                   value={form.email}
                   onChange={set("email")}
                   autoComplete="email"
@@ -118,6 +152,7 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
               <Field label="Telefone do responsável">
                 <Input
                   type="tel"
+                  required
                   maxLength={25}
                   value={form.tel}
                   onChange={set("tel")}
@@ -173,15 +208,17 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
           </section>
           <div className="flex flex-wrap gap-3">
             <Button
-              disabled
-              title="A contratação de pacotes ainda não está disponível."
+              type="submit"
+              disabled={enviando || enviado}
             >
-              {gestao ? "Cadastrar pacote" : "Enviar solicitação"}
+              {enviado ? "Solicitação enviada" : enviando ? "Enviando…" : gestao ? "Cadastrar pacote" : "Enviar solicitação"}
             </Button>
             <Button variant="ghost" onClick={() => setPortalAberto(true)}>
               Ver prévia do portal
             </Button>
           </div>
+          {erro && <p role="alert" className="mt-4 text-sm text-danger">{erro}</p>}
+          {enviado && <p role="status" className="mt-4 text-sm text-text-sub">Solicitação salva. A equipe entrará em contato; nenhum traje foi reservado.</p>}
           <p className="mt-4 text-xs text-text-sub">
             Para uma contratação disponível agora,{" "}
             <Link

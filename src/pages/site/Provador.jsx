@@ -56,10 +56,6 @@ export default function Provador() {
             Ver a coleção
           </Link>
         </header>
-        <p className="fitting-demo-note">
-          Provador em demonstração: a aplicação do terno com IA ainda não está
-          disponível.
-        </p>
         {modelos.length === 0 ? (
           <div className="fitting-empty">
             <h2>A coleção está sendo preparada.</h2>
@@ -121,7 +117,7 @@ export default function Provador() {
                       capture.cameraStatus !== "idle"
                     }
                   >
-                    Ver prévia de demonstração
+                    Conferir e gerar prévia
                   </Button>
                   <span>
                     {!capture.photo

@@ -10,21 +10,22 @@ export class ApiError extends Error {
   }
 }
 let refreshing;
-async function send(path, { method = "GET", body, token, signal } = {}) {
+async function send(path, { method = "GET", body, token, signal, timeoutMs = 20000 } = {}) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 20000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   const abort = () => controller.abort();
   signal?.addEventListener("abort", abort, { once: true });
   if (signal?.aborted) controller.abort();
   try {
+    const multipart = typeof FormData !== "undefined" && body instanceof FormData;
     const response = await fetch(API_URL + path, {
       method,
       signal: controller.signal,
       headers: {
-        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+        ...(body !== undefined && !multipart ? { "Content-Type": "application/json" } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+      ...(body !== undefined ? { body: multipart ? body : JSON.stringify(body) } : {}),
     });
     const data =
       response.status === 204 ? null : await response.json().catch(() => null);

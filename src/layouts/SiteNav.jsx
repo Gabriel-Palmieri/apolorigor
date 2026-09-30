@@ -4,11 +4,15 @@ import { siteDestination } from "../app/navigation.js";
 import { ThemeToggle } from "../shared/ui/tema/ThemeToggle.jsx";
 import { useSessao } from "../features/conta/sessao.js";
 import { cn } from "../shared/lib/cn.js";
+import { BrandLogo } from "../shared/ui/estrutura/BrandLogo.jsx";
 
 export default function SiteNav({ view }) {
   const menuRef = useRef(null);
   const sessao = useSessao();
   const cliente = sessao?.tipo === "cliente" ? sessao : null;
+  const admin = sessao?.tipo === "admin";
+  const accountPath = admin ? "/sistema" : cliente ? "/conta/pedidos" : "/entrar";
+  const accountLabel = admin ? "Painel" : cliente ? cliente.nome.split(" ")[0] : "Entrar";
   const links = [
     { key: "colecao", label: "Coleção" },
     { key: "provador", label: "Provador" },
@@ -36,6 +40,7 @@ export default function SiteNav({ view }) {
           className="site-brand"
           aria-label="Apollo Rigor, página inicial"
         >
+          <BrandLogo className="site-brand-logo" />
           <span className="block font-display text-3xl desktop:text-4xl text-text leading-none tracking-tight">
             Apollo Rigor
           </span>
@@ -75,13 +80,13 @@ export default function SiteNav({ view }) {
               {[
                 ...links,
                 {
-                  key: cliente ? "conta" : "entrar",
-                  label: cliente ? "Minha conta" : "Entrar",
+                  key: admin ? "equipe" : cliente ? "conta" : "entrar",
+                  label: admin ? "Painel da equipe" : cliente ? "Minha conta" : "Entrar",
                 },
               ].map((link) => (
                 <Link
                   key={link.key}
-                  to={siteDestination(link.key)}
+                  to={link.key === "equipe" ? "/sistema" : siteDestination(link.key)}
                   onClick={() => menuRef.current?.removeAttribute("open")}
                 >
                   {link.label}
@@ -90,10 +95,10 @@ export default function SiteNav({ view }) {
             </nav>
           </details>
           <Link
-            to={cliente ? "/conta/pedidos" : "/entrar"}
+            to={accountPath}
             className="site-account-link site-nav-link border-l border-border pl-5"
           >
-            {cliente ? cliente.nome.split(" ")[0] : "Entrar"}
+            {accountLabel}
           </Link>
           <ThemeToggle variant="minimal" />
         </nav>

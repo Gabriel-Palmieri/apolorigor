@@ -1,4 +1,3 @@
-import { TickRule } from "../../shared/ui/estrutura/Tape.jsx";
 import { cn } from "../../shared/lib/cn.js";
 import { aparenciaTom } from "../../shared/ui/feedback/aparencia.js";
 import { ProgressFill } from "../../shared/ui/feedback/Progress.jsx";
@@ -60,10 +59,6 @@ const LegendSwatch = ({ className, t }) => (
 function MiniStat({ label, val, sub, textClassName }) {
   return (
     <div className="bg-card border border-border rounded-card pt-3 px-3.5 pb-3.5">
-      <TickRule
-        textClassName={textClassName}
-        className="h-1.5 mb-2.5 opacity-70"
-      />
       <p className="text-micro text-text-sub mt-0 mx-0 mb-1.5 font-semibold tracking-widest font-mono tabular-nums uppercase">
         {label}
       </p>

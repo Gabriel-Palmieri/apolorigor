@@ -1,17 +1,18 @@
 import { Link, NavLink } from "react-router-dom";
 import { ERP_NAV as NAV } from "../app/navigation.js";
 import { cn } from "../shared/lib/cn.js";
+import { BrandLogo } from "../shared/ui/estrutura/BrandLogo.jsx";
 
 export default function ErpSidebar({ page, novos, onNavigate }) {
   return (
-    <aside className="erp-sidebar w-56 shrink-0 bg-bg-elevated text-text border-r border-border-soft flex flex-col">
+    <aside className="erp-sidebar h-dvh min-h-dvh w-56 shrink-0 bg-bg-elevated text-text border-r border-border-soft flex flex-col">
       <div className="px-6 pt-7 pb-8">
         <Link
           to="/sistema/dashboard"
           onClick={onNavigate}
           className="font-display text-2xl text-text no-underline"
         >
-          Apollo Rigor
+          <BrandLogo className="erp-brand-logo" />
         </Link>
         <p className="m-0 mt-2 text-xs text-text-sub">Gestão do ateliê</p>
       </div>

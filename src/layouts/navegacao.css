@@ -12,6 +12,30 @@
   .site-brand {
     @apply shrink-0;
   }
+  .site-brand-logo {
+    display: block;
+    width: 150px;
+    height: 58px;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .site-brand > span {
+    display: none;
+  }
+  .erp-brand-logo {
+    display: block;
+    width: 150px;
+    height: 58px;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .footer-brand-logo {
+    display: block;
+    width: 180px;
+    height: 66px;
+    object-fit: contain;
+    object-position: left center;
+  }
   .site-mobile-menu {
     @apply hidden;
   }
@@ -66,7 +90,7 @@
       @apply hidden !important;
     }
     .erp-navigation > .erp-sidebar {
-      @apply w-full !important;
+      @apply h-auto min-h-0 w-full !important;
     }
     .erp-heading {
       @apply flex-wrap;
@@ -137,11 +161,9 @@
   .site-text-link svg {
     @apply shrink-0;
   }
-  .site-header .site-brand > span:first-child {
-    @apply text-3xl;
-  }
-  .site-header .site-brand > span:last-child {
-    @apply mt-1;
+  .site-header .site-brand-logo {
+    width: 142px;
+    height: 54px;
   }
   .site-mobile-menu > summary {
     @apply flex min-h-11 items-center gap-2;

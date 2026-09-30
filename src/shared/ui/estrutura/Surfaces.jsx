@@ -26,7 +26,6 @@ export function Card({ children, className, onClick, accent }) {
 export function Stat({ label, value, hint, textClassName = "text-text", className }) {
   return (
     <Card className={cn("p-4", className)}>
-      <TickRule textClassName={textClassName} className="mb-3 h-1.5 opacity-70" />
       <p className="mb-2 font-mono text-micro font-semibold uppercase tracking-widest text-text-sub">
         {label}
       </p>

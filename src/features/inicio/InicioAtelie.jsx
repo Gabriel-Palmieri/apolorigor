@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import { ATELIE } from "./conteudoInicio.js";
+import { useSessao } from "../conta/sessao.js";
+import { BrandLogo } from "../../shared/ui/estrutura/BrandLogo.jsx";
 
 export default function InicioAtelie({ go }) {
+  const sessao = useSessao();
   return (
     <footer id="atelie" className="bg-sidebar text-sidebar-text scroll-mt-24">
       <div className="max-w-site mx-auto py-12 desktop:py-20 px-gutter">
@@ -40,28 +43,36 @@ export default function InicioAtelie({ go }) {
               >
                 {ATELIE.email}
               </a>
-              <button
-                onClick={() => go("conta", "pedidos")}
-                className="mt-6 p-0 min-h-11 bg-transparent border-0 text-sidebar-text underline underline-offset-4 text-sm cursor-pointer"
-              >
-                Meus pedidos
-              </button>
+              {sessao?.tipo === "admin" ? (
+                <Link to="/sistema" className="mt-6 inline-flex min-h-11 items-center text-sm text-sidebar-text underline underline-offset-4">
+                  Painel da equipe
+                </Link>
+              ) : (
+                <button
+                  onClick={() => go("conta", "pedidos")}
+                  className="mt-6 p-0 min-h-11 bg-transparent border-0 text-sidebar-text underline underline-offset-4 text-sm cursor-pointer"
+                >
+                  Meus pedidos
+                </button>
+              )}
             </div>
           </div>
         </div>
         <div className="mt-12 desktop:mt-20 pt-6 border-t border-sidebar-text/20 flex justify-between items-end flex-wrap gap-5">
           <div>
-            <p className="m-0 font-display text-3xl">Apollo Rigor</p>
+            <BrandLogo className="footer-brand-logo" />
             <p className="mt-2 mb-0 text-xs text-sidebar-text">
               © {new Date().getFullYear()} Apollo Rigor
             </p>
           </div>
-          <Link
-            to="/sistema"
-            className="text-sm text-sidebar-text underline underline-offset-4"
-          >
-            Acesso da equipe
-          </Link>
+          {sessao?.tipo === "admin" && (
+            <Link
+              to="/sistema"
+              className="text-sm text-sidebar-text underline underline-offset-4"
+            >
+              Acesso da equipe
+            </Link>
+          )}
         </div>
       </div>
     </footer>
