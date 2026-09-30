@@ -79,28 +79,28 @@ export default function Anuario() {
   return (
     <div>
       <Card className="mb-4">
-        <div className="flex justify-between items-center flex-wrap gap-2.5">
-          <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-2">
             {modo !== "agenda" && (
               <>
-                <button onClick={() => nav(-1)} className={navBtn}>
+                <button aria-label="Período anterior" onClick={() => nav(-1)} className={navBtn}>
                   ‹
                 </button>
-                <button onClick={() => nav(1)} className={navBtn}>
+                <button aria-label="Próximo período" onClick={() => nav(1)} className={navBtn}>
                   ›
                 </button>
                 <button
                   onClick={irParaHoje}
-                  className={cn("w-auto py-1.5 px-3 text-caption", navBtn)}
+                  className={cn("w-auto min-w-16 px-4 text-sm", navBtn)}
                 >
                   Hoje
                 </button>
               </>
             )}
-            <Heading size={15}>{titulo}</Heading>
+            <div className="order-first w-full min-w-0 sm:order-none sm:ml-2 sm:w-auto"><Heading size={15}>{titulo}</Heading></div>
           </div>
-          <div className="flex gap-1.5 items-center flex-wrap">
-            <label className="text-micro text-text-sub font-bold tracking-wide flex items-center gap-1.5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <label className="text-xs text-text-sub font-semibold flex items-center justify-between gap-3 sm:justify-start">
               CAPACIDADE/DIA
               <input
                 type="number"
@@ -109,10 +109,10 @@ export default function Anuario() {
                 onChange={(e) =>
                   setCap(Math.max(1, Number(e.target.value) || 1))
                 }
-                className="w-14 py-1 px-1.5 bg-input-bg border border-border rounded-card text-text text-xs outline-none font-sans"
+                className="w-20 min-h-11 py-2 px-3 bg-input-bg border border-border rounded-card text-text text-xs outline-none font-sans"
               />
             </label>
-            <div className="w-px h-5 bg-border my-0 mx-1" />
+            <div role="group" aria-label="Visualização do calendário" className="grid grid-cols-4 gap-1.5 sm:flex">
             {[
               ["agenda", "Agenda"],
               ["dia", "Dia"],
@@ -121,12 +121,13 @@ export default function Anuario() {
             ].map(([k, l]) => (
               <button
                 key={k}
+                aria-pressed={modo === k}
                 onClick={() => {
                   setModo(k);
                   if (k === "dia") setCursor(parse(selected));
                 }}
                 className={cn(
-                  "py-1.5 px-3.5 rounded-card cursor-pointer text-xs font-bold font-sans",
+                  "min-h-11 min-w-0 px-2 sm:px-4 rounded-card cursor-pointer text-xs sm:text-sm font-semibold font-sans",
                   modo === k ? "bg-gold" : "bg-transparent",
                   modo === k ? "text-accent-ink" : "text-text-sub",
                   modo === k ? "border-0" : "border border-border",
@@ -135,6 +136,7 @@ export default function Anuario() {
                 {l}
               </button>
             ))}
+            </div>
           </div>
         </div>
         {resumoMes && (

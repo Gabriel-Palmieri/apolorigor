@@ -11,7 +11,7 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
     (_, i) => addDays(start, i),
   );
   return (
-    <div className="grid grid-cols-7 gap-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
       {days.map((d, i) => {
         const dstr = iso(d);
         const { saidas, retornos, nSaidas, nRetornos, nAtivos } = aggDia(
@@ -23,28 +23,33 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
         return (
           <div
             key={i}
+            role="button"
+            tabIndex={0}
+            aria-pressed={sel}
+            aria-label={`${DIAS[d.getDay()]} ${d.getDate()}: ${nSaidas} saídas, ${nRetornos} retornos`}
+            onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onSelect(dstr); } }}
             onClick={() => onSelect(dstr)}
             className={cn(
-              "min-h-56 p-2 cursor-pointer rounded-card",
+              "min-w-0 p-3 cursor-pointer rounded-card xl:min-h-56 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold",
               sel ? "bg-gold-dim" : wknd ? "bg-bg-elevated" : "bg-card",
               cn("border", sel ? "border-gold" : "border-border"),
             )}
           >
-            <div className="flex justify-between mb-1.5">
+            <div className="flex justify-between gap-3 mb-3 xl:flex-col">
               <div>
                 <p
                   className={cn(
-                    "m-0 text-micro font-bold",
+                    "m-0 text-xs font-bold",
                     wknd ? "text-gold-text" : "text-text-sub",
                   )}
                 >
                   {DIAS[d.getDay()]}
                 </p>
-                <p className="m-0 text-base font-bold text-text">
+                <p className="m-0 text-xl font-bold text-text">
                   {d.getDate()}
                 </p>
               </div>
-              <div className="text-right text-micro text-text-sub leading-normal">
+              <div className="text-right text-xs text-text-sub leading-relaxed xl:text-left">
                 <div
                   className={cn(
                     "font-bold",
@@ -80,7 +85,7 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
               </div>
             ))}
             {saidas.length === 0 && retornos.length === 0 && (
-              <p className="m-0 text-micro text-green-fg">Livre</p>
+              <p className="m-0 text-xs text-green-fg">Livre</p>
             )}
           </div>
         );

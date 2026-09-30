@@ -15,6 +15,9 @@ function VisaoMes({ cursor, eventos, cap, selected, onSelect }) {
   const hoje = iso(new Date());
   return (
     <div>
+      <p className="mt-0 mb-3 text-xs text-text-sub sm:hidden">Deslize para os lados para ver todos os dias.</p>
+      <div className="overflow-x-auto pb-2" role="region" aria-label="Calendário mensal" tabIndex={0}>
+      <div className="min-w-[560px]">
       <div className="grid grid-cols-7 gap-1.5 mb-1.5">
         {DIAS.map((d, i) => (
           <p
@@ -96,6 +99,8 @@ function VisaoMes({ cursor, eventos, cap, selected, onSelect }) {
             </div>
           );
         })}
+      </div>
+      </div>
       </div>
       <div className="flex gap-3.5 mt-2.5 text-micro text-text-sub flex-wrap items-center">
         <span>↑ saídas · ↓ retornos · fundo = carga do dia:</span>

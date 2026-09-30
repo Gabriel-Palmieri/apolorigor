@@ -28,13 +28,13 @@ function capacityAppearance(n, cap) {
 const linkBtn =
   "border-0 bg-transparent p-0 text-caption text-text-sub underline cursor-pointer hover:text-gold-text";
 const navBtn =
-  "size-8 rounded-control border border-border bg-transparent text-base text-text hover:border-gold";
+  "size-11 shrink-0 rounded-control border border-border bg-transparent text-base text-text hover:border-gold";
 function CapacityBar({ n, cap, label }) {
   const pct = cap > 0 ? Math.min(100, (n / cap) * 100) : 0;
   const h = capacityAppearance(n, cap);
   return (
     <div>
-      <div className="flex justify-between text-micro text-text-sub mb-1">
+      <div className="flex flex-wrap justify-between gap-x-2 gap-y-1 text-xs text-text-sub mb-1">
         <span>{label}</span>
         <span className={cn("font-bold", h.textClassName)}>
           {n} / {cap}
