@@ -1,3 +1,4 @@
+import { useListaPaginada } from "../../features/listas/useListaPaginada.js";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useData } from "../../data/useData.js";
@@ -6,7 +7,9 @@ import FormularioTransacao from "../../features/locacoes/FormularioTransacao.jsx
 import PainelAtelie from "../../features/ajustes/PainelAtelie.jsx";
 import { Button } from "../../shared/ui/botoes/Button.jsx";
 export default function Ajustes() {
-  const { trans, conflicts } = useData();
+  const { trans } = useData();
+  const paged = useListaPaginada("trans");
+  const overdue = paged.pagination?.summary?.overdue || 0;
   const [editing, setEditing] = useState(null);
   const [params, setParams] = useSearchParams();
   const costura = params.get("aba") === "costura";
@@ -40,12 +43,12 @@ export default function Ajustes() {
             Registre a retirada ou devolução de cada traje. O acompanhamento de
             costura ainda não está disponível.
           </p>
-          {conflicts.overdue.length > 0 && (
+          {overdue > 0 && (
             <p className="text-gold-text mb-6">
-              {conflicts.overdue.length} devolução(ões) em atraso.
+              {overdue} devolução(ões) em atraso.
             </p>
           )}
-          <TransacaoLista rows={rows} admin onEdit={setEditing} />
+          <TransacaoLista rows={rows} paged={paged} admin onEdit={setEditing} />
         </>
       )}
       {editing && (

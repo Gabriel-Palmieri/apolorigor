@@ -23,30 +23,30 @@ function Bloco({ title, rows, date }) {
     </section>
   );
 }
-export default function VisaoDia({ dstr, eventos, cap }) {
-  const { saidas, retornos, ativos, nSaidas, nRetornos, nAtivos } = aggDia(
-    eventos,
-    dstr,
-  );
+export default function VisaoDia({ dstr, eventos, counts, cap }) {
+  const { saidas, retornos, nSaidas, nRetornos, nAtivos } = {
+    ...aggDia(eventos, dstr),
+    ...counts?.[dstr],
+  };
   return (
     <div>
       <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3 mb-5">
         <MiniStat
           label="Retiradas"
           val={nSaidas}
-          sub={saidas.length + " operação(ões)"}
+          sub={nSaidas + " operação(ões)"}
           textClassName={capacityAppearance(nSaidas, cap).textClassName}
         />
         <MiniStat
           label="Devoluções"
           val={nRetornos}
-          sub={retornos.length + " operação(ões)"}
+          sub={nRetornos + " operação(ões)"}
           textClassName="text-gold"
         />
         <MiniStat
           label="Locações no período"
           val={nAtivos}
-          sub={ativos.length + " operação(ões)"}
+          sub={nAtivos + " operação(ões)"}
           textClassName="text-text"
         />
       </div>

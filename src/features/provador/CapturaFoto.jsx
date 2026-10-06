@@ -155,8 +155,9 @@ export default function CapturaFoto({ capture }) {
         />
       </div>
       <p className="fitting-photo-footnote">
-        JPG, PNG ou WebP, até 10 MB. Sua foto fica somente nesta página e é
-        descartada ao sair.
+        JPG, PNG ou WebP, até 10 MB. Sua foto fica nesta página e é descartada
+        ao sair. Ela só será enviada para gerar a prévia com IA se você
+        autorizar na próxima etapa.
       </p>
     </section>
   );

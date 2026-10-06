@@ -12,10 +12,11 @@ Aplicação web para uma loja de alfaiataria e trajes de cerimônia, com vitrine
 
 - O usuário escolheu uma identidade de alfaiataria contemporânea, sóbria e fotográfica. A paleta existente dos dois temas deve ser preservada, conforme a seção de direção visual do README.md.
 - Existe um único padrão de desenvolvimento: páginas compõem features, domínio mantém regras puras, dados usam o repositório compartilhado e os controles vêm do kit de UI.
-- A aplicação é uma demonstração local, sem backend ou autenticação real. Persistência de catálogo e operações ocorre no navegador.
-- O provador deve permitir escolher um terno da loja, autorizar a câmera e tirar uma foto, ou enviar um arquivo. O usuário pediu apenas o frontend; a aplicação do terno pela IA depende de uma integração futura.
-- A foto do provador não é persistida nem enviada. A prévia atual deve identificar claramente a demonstração e não se apresentar como imagem gerada por IA.
+- A aplicação está integrada ao backend NestJS em `../apolloapi`, com autenticação via Supabase e persistência comercial no servidor. O navegador mantém cache temporário, sessão e rascunho do pedido; não substitui as regras de estoque do backend.
+- O provador permite escolher um terno, abrir a câmera ou enviar uma foto. A conferência é local; a geração opcional envia as imagens à API e à Fal.ai somente após consentimento explícito e ação de gerar.
+- A foto não é persistida no armazenamento do navegador. O resultado gerado deve ser identificado como ilustrativo e não prometer tamanho ou caimento exatos.
+- Pacotes permitem enviar solicitações com participantes e consultar a lista na gestão. Contratação, portal com acompanhamento individual e ordens de costura ainda não estão implementados.
 
 ## Plataforma e limites
 
-Plataforma web responsiva, incluindo navegadores de celular. O acesso à câmera depende das permissões do dispositivo e de contexto seguro; o upload permite continuar quando a câmera não está disponível. A prova virtual futura é uma visualização de estilo, não uma medição ou promessa de caimento.
+Plataforma web responsiva, incluindo navegadores de celular. O acesso à câmera depende das permissões do dispositivo e de contexto seguro; o upload permite continuar quando a câmera não está disponível. A geração depende do provedor de IA e da configuração do backend. A homologação com banco, autenticação, e-mails e geração reais permanece pendente.

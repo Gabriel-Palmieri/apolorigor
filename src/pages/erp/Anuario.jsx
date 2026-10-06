@@ -4,48 +4,59 @@ import {
   Heading,
 } from "../../shared/ui/estrutura/Typography.jsx";
 import { cn } from "../../shared/lib/cn.js";
-import { useData } from "../../data/useData.js";
+import { useRequest } from "../../data/useRequest.js";
+import { productFromApi, transactionFromApi } from "../../data/adapters.js";
+import Paginacao from "../../shared/ui/estrutura/Paginacao.jsx";
 import { useState, useMemo } from "react";
 import { fmtDate } from "../../shared/lib/format.js";
 import {
   MESES,
   iso,
   startOfWeek,
-  parse,
+  parse, addDays,
 } from "../../features/agenda/calendario.js";
-import { buildEventos, aggDia } from "../../domain/agenda.js";
+import { buildEventos } from "../../domain/agenda.js";
 import { navBtn } from "../../features/agenda/CalendarioUI.jsx";
 import VisaoMes from "../../features/agenda/VisaoMes.jsx";
 import VisaoSemana from "../../features/agenda/VisaoSemana.jsx";
 import VisaoAgenda from "../../features/agenda/VisaoAgenda.jsx";
 import VisaoDia from "../../features/agenda/VisaoDia.jsx";
 export default function Anuario() {
-  const { produtos, trans } = useData();
   const [modo, setModo] = useState("agenda");
   const [cursor, setCursor] = useState(new Date());
   const [selected, setSelected] = useState(iso(new Date()));
   const [cap, setCap] = useState(50);
-  const eventos = useMemo(
-    () => buildEventos(produtos, trans),
-    [produtos, trans],
-  );
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const start = modo === "mes" ? startOfWeek(new Date(cursor.getFullYear(), cursor.getMonth(), 1)) : modo === "semana" ? startOfWeek(cursor) : parse(selected);
+  const end = addDays(start, modo === "mes" ? 41 : modo === "semana" ? 6 : 0);
+  const summary = useRequest(modo === "agenda" ? null : "/transactions/calendar?" + new URLSearchParams({ start: iso(start), end: iso(end) }));
+  const counts = useMemo(() => Object.fromEntries((summary.data || []).map(row => [row.day, row])), [summary.data]);
+  const detail = useRequest("/transactions/page?" + new URLSearchParams({ page, limit: 20, type: "RENTAL", status: "CONFIRMED", sort: "date", ...(modo === "agenda" ? { q: search } : { day: selected }) }));
+  const eventos = useMemo(() => {
+    const rows = detail.data?.items || [];
+    return buildEventos(rows.map(row => productFromApi({ ...row.variant.product, variants: [] })), rows.map(row => transactionFromApi(row, [], [])));
+  }, [detail.data]);
+  const selectDay = day => { setSelected(day); setPage(1); };
+  const changeMode = mode => { setModo(mode); setPage(1); };
+  const gridEvents = modo === "dia" ? eventos : [];
   const nav = (dir) => {
     const c = new Date(cursor);
     if (modo === "mes") c.setMonth(c.getMonth() + dir);
     else if (modo === "semana") c.setDate(c.getDate() + dir * 7);
     else c.setDate(c.getDate() + dir);
     setCursor(c);
-    if (modo === "dia") setSelected(iso(c));
+    selectDay(iso(c));
   };
   const irParaHoje = () => {
     const t = new Date();
     setCursor(t);
-    setSelected(iso(t));
+    selectDay(iso(t));
   };
   const irParaDia = (dstr) => {
-    setSelected(dstr);
+    selectDay(dstr);
     setCursor(parse(dstr));
-    setModo("dia");
+    changeMode("dia");
   };
   const titulo =
     modo === "mes"
@@ -65,7 +76,7 @@ export default function Anuario() {
     for (let d = 1; d <= 31; d++) {
       const dt = new Date(y, m, d);
       if (dt.getMonth() !== m) break;
-      const { nSaidas } = aggDia(eventos, iso(dt));
+      const { nSaidas = 0 } = counts[iso(dt)] || {};
       totalSaidas += nSaidas;
       pico = Math.max(pico, nSaidas);
       if (nSaidas > cap) diasCheios++;
@@ -75,7 +86,7 @@ export default function Anuario() {
       pico,
       diasCheios,
     };
-  }, [modo, cursor, eventos, cap]);
+  }, [modo, cursor, counts, cap]);
   return (
     <div>
       <Card className="mb-4">
@@ -123,7 +134,7 @@ export default function Anuario() {
                 key={k}
                 aria-pressed={modo === k}
                 onClick={() => {
-                  setModo(k);
+                  changeMode(k);
                   if (k === "dia") setCursor(parse(selected));
                 }}
                 className={cn(
@@ -139,7 +150,7 @@ export default function Anuario() {
             </div>
           </div>
         </div>
-        {resumoMes && (
+        {resumoMes && summary.data && (
           <div className="flex gap-4 mt-3 pt-3 border-t border-t-border text-caption text-text-sub flex-wrap">
             <span>
               <strong className="text-text">{resumoMes.totalSaidas}</strong>{" "}
@@ -172,51 +183,57 @@ export default function Anuario() {
         )}
       </Card>
 
+      {(detail.loading || summary.loading) && <p role="status">Atualizando agenda…</p>}
+      {summary.error && <p role="alert">{summary.error.message} <button onClick={summary.retry}>Tentar novamente</button></p>}
+      {detail.error && <p role="alert">{detail.error.message} <button onClick={detail.retry}>Tentar novamente</button></p>}
       <Card className="mb-4">
         {modo === "agenda" && (
-          <VisaoAgenda eventos={eventos} cap={cap} onSelectDay={irParaDia} />
+          <VisaoAgenda eventos={eventos} cap={cap} onSelectDay={irParaDia} search={search} onSearch={value => { setSearch(value); setPage(1); }} />
         )}
-        {modo === "mes" && (
+        {modo === "mes" && summary.data && (
           <VisaoMes
             cursor={cursor}
-            eventos={eventos}
+            eventos={gridEvents}
+            counts={counts}
             cap={cap}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={selectDay}
           />
         )}
-        {modo === "semana" && (
+        {modo === "semana" && summary.data && (
           <VisaoSemana
             cursor={cursor}
-            eventos={eventos}
+            eventos={gridEvents}
+            counts={counts}
             cap={cap}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={selectDay}
           />
         )}
-        {modo === "dia" && (
+        {modo === "dia" && summary.data && (
           <VisaoDia
             dstr={selected}
-            produtos={produtos}
+            counts={counts}
             eventos={eventos}
             cap={cap}
           />
         )}
       </Card>
 
-      {(modo === "mes" || modo === "semana") && (
+      {(modo === "mes" || modo === "semana") && summary.data && (
         <Card>
           <SectionTitle>
             DETALHES DE {fmtDate(selected).toUpperCase()}
           </SectionTitle>
           <VisaoDia
             dstr={selected}
-            produtos={produtos}
+            counts={counts}
             eventos={eventos}
             cap={cap}
           />
         </Card>
       )}
+      <Paginacao pagination={detail.data} pending={detail.loading} error={detail.error?.message} onPage={setPage} />
     </div>
   );
 }

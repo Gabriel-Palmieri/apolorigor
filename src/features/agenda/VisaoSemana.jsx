@@ -2,7 +2,7 @@ import { cn } from "../../shared/lib/cn.js";
 import { DIAS, iso, addDays, startOfWeek, isWeekend } from "./calendario.js";
 import { aggDia } from "../../domain/agenda.js";
 import { capacityAppearance, CapacityBar } from "./CalendarioUI.jsx";
-function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
+function VisaoSemana({ cursor, eventos, counts, cap, selected, onSelect }) {
   const start = startOfWeek(cursor);
   const days = Array.from(
     {
@@ -14,10 +14,10 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
       {days.map((d, i) => {
         const dstr = iso(d);
-        const { saidas, retornos, nSaidas, nRetornos, nAtivos } = aggDia(
-          eventos,
-          dstr,
-        );
+        const { saidas, retornos, nSaidas, nRetornos, nAtivos } = {
+          ...aggDia(eventos, dstr),
+          ...counts?.[dstr],
+        };
         const sel = selected === dstr;
         const wknd = isWeekend(d);
         return (
@@ -27,7 +27,12 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
             tabIndex={0}
             aria-pressed={sel}
             aria-label={`${DIAS[d.getDay()]} ${d.getDate()}: ${nSaidas} saídas, ${nRetornos} retornos`}
-            onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onSelect(dstr); } }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelect(dstr);
+              }
+            }}
             onClick={() => onSelect(dstr)}
             className={cn(
               "min-w-0 p-3 cursor-pointer rounded-card xl:min-h-56 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold",
@@ -45,9 +50,7 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
                 >
                   {DIAS[d.getDay()]}
                 </p>
-                <p className="m-0 text-xl font-bold text-text">
-                  {d.getDate()}
-                </p>
+                <p className="m-0 text-xl font-bold text-text">{d.getDate()}</p>
               </div>
               <div className="text-right text-xs text-text-sub leading-relaxed xl:text-left">
                 <div
@@ -84,7 +87,7 @@ function VisaoSemana({ cursor, eventos, cap, selected, onSelect }) {
                 ↓ {e.nPecas} {e.titulo}
               </div>
             ))}
-            {saidas.length === 0 && retornos.length === 0 && (
+            {nSaidas === 0 && nRetornos === 0 && (
               <p className="m-0 text-xs text-green-fg">Livre</p>
             )}
           </div>

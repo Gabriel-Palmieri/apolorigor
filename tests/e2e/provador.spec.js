@@ -14,14 +14,14 @@ test('home section and navigation open the fitting room with no automatic camera
   await page.goto('/');
   await page.getByRole('button', { name: 'Conhecer o provador' }).click();
   await expect(page).toHaveURL(/\/provador$/);
-  await expect(page.getByRole('button', { name: 'Ver prévia de demonstração' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Conferir e gerar prévia' })).toBeDisabled();
   expect(await page.evaluate(() => window.cameraCalls)).toBe(0);
   await page.getByRole('button', { name: 'Abrir câmera' }).click();
   await expect(page.getByRole('alert')).toContainText('não foi autorizado');
   await expect(page.getByRole('button', { name: 'Enviar foto', exact: true })).toBeEnabled();
 });
 
-test('upload, suit selection and honest demo preview work without persisting the photo', async ({ page }) => {
+test('upload and preview require consent and never persist the photo', async ({ page }) => {
   await page.goto('/provador?modelo=10000000-0000-4000-8000-000000000001');
   await expect(page.getByRole('button', { name: /Terno Oxford/ })).toHaveAttribute('aria-pressed', 'true');
   await page.reload();
@@ -30,9 +30,9 @@ test('upload, suit selection and honest demo preview work without persisting the
   await expect(page.getByAltText('Sua foto escolhida para a prova')).toBeVisible();
   await page.getByRole('button', { name: /Terno Oxford/ }).click();
   await expect(page).toHaveURL(/modelo=10000000/);
-  await page.getByRole('button', { name: 'Ver prévia de demonstração' }).click();
+  await page.getByRole('button', { name: 'Conferir e gerar prévia' }).click();
   await expect(page.getByRole('heading', { name: 'Sua escolha, lado a lado.' })).toBeFocused();
-  await expect(page.getByText(/o terno não foi aplicado/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Gerar prévia com IA' })).toBeDisabled();
   await page.getByRole('button', { name: 'Voltar ao provador' }).click();
   await expect(page.getByAltText('Sua foto escolhida para a prova')).toBeVisible();
   await page.getByRole('button', { name: 'Remover foto' }).click();
@@ -85,13 +85,19 @@ test.describe('camera lifecycle', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       window.cameraAudit = { calls: 0, stops: 0 };
-      const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
-      navigator.mediaDevices.getUserMedia = async constraints => {
+      navigator.mediaDevices.getUserMedia = async () => {
         window.cameraAudit.calls++;
-        const stream = await original(constraints);
+        const canvas = document.createElement('canvas');
+        canvas.width = 640;
+        canvas.height = 480;
+        const context = canvas.getContext('2d');
+        const paint = () => { context.fillStyle = '#73664c'; context.fillRect(0, 0, 640, 480); };
+        paint();
+        const timer = setInterval(paint, 50);
+        const stream = canvas.captureStream(20);
         stream.getTracks().forEach(track => {
           const stop = track.stop.bind(track);
-          track.stop = () => { window.cameraAudit.stops++; stop(); };
+          track.stop = () => { window.cameraAudit.stops++; clearInterval(timer); stop(); };
         });
         return stream;
       };

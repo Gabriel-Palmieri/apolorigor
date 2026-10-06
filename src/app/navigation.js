@@ -1,3 +1,4 @@
+/** @type {Record<string, string>} */
 export const SITE_PATHS = {
   home: "/",
   colecao: "/colecao",
@@ -40,16 +41,18 @@ export const ERP_NAV = [
     sub: "Ajustes e devoluções",
   },
 ];
+/** @param {string} destino @param {string} [extra] */
 export function siteDestination(destino, extra) {
   if (destino === "como-funciona" || destino === "atelie")
     return "/#" + destino;
-  if (destino === "conta" && ["perfil", "pedidos"].includes(extra))
+  if (destino === "conta" && ["perfil", "pedidos"].includes(extra || ""))
     return "/conta/" + extra;
   if (destino === "colecao" && extra)
     return "/colecao?vitrine=" + encodeURIComponent(extra);
   if (!SITE_PATHS[destino]) throw new Error("Página desconhecida: " + destino);
   return SITE_PATHS[destino];
 }
+/** @param {{hash: string, pathname: string}} location */
 export function migrateLegacyUrl(location) {
   const hash = location.hash.slice(1);
   const pathname = location.pathname.replace(/\/+$/, "") || "/";

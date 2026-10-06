@@ -10,6 +10,20 @@
   },
   "include": [
     "src/domain/types.d.ts",
-    "src/shared/ui/feedback/status.js"
+    "src/data/contracts.d.ts",
+    "src/data/adapters.js",
+    "src/app/dataScope.js",
+    "src/domain/rastreio.js",
+    "src/domain/provador.js",
+    "src/shared/lib/dates.js",
+    "src/shared/lib/format.js",
+    "src/shared/lib/images.js",
+    "src/shared/ui/feedback/status.js",
+    "tests/types/*.test.ts",
+    "src/domain/*.js",
+    "src/data/orderIntent.js",
+    "src/app/navigation.js",
+    "src/features/agenda/calendario.js",
+    "src/shared/lib/cn.js"
   ]
 }

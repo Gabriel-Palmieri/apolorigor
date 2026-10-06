@@ -5,6 +5,7 @@ import { Button } from "../../shared/ui/botoes/Button.jsx";
 import { Alert } from "../../shared/ui/feedback/Feedback.jsx";
 import { salvarProduto, desativarProduto } from "../../data/catalogo.js";
 import { CATEGORIAS } from "../../domain/catalogo.js";
+import { isProductPhotoUrl } from "../../shared/lib/images.js";
 export default function FormularioProdutoGestao({ produto, onClose }) {
   const [form, setForm] = useState({
     nome: produto?.nome || "",
@@ -29,6 +30,8 @@ export default function FormularioProdutoGestao({ produto, onClose }) {
     setBusy(true);
     setError("");
     try {
+      if (form.foto.trim() && !isProductPhotoUrl(form.foto.trim()))
+        throw new Error("Use uma imagem da pasta /produtos/ ou um endereço HTTPS válido.");
       if (new Set(variantes.map((v) => v.tam.trim())).size !== variantes.length)
         throw new Error("Cada tamanho deve aparecer apenas uma vez.");
       await salvarProduto({ ...form, id: produto?.id, variantes });
@@ -90,10 +93,10 @@ export default function FormularioProdutoGestao({ produto, onClose }) {
               <Input maxLength={80} value={form[key]} onChange={set(key)} />
             </Field>
           ))}
-          <Field label="Foto" hint="Endereço HTTPS da imagem.">
+          <Field label="Foto" hint="Endereço HTTPS ou imagem local em /produtos/.">
             <Input
-              type="url"
-              pattern="https://.*"
+              type="text"
+              inputMode="url"
               value={form.foto}
               onChange={set("foto")}
               placeholder="https://…"

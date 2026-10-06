@@ -1,10 +1,10 @@
+import SeletorPaginado from "../listas/SeletorPaginado.jsx";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../shared/ui/botoes/Button.jsx";
 import {
   Field,
   Input,
-  Select,
   TextArea,
 } from "../../shared/ui/formularios/Form.jsx";
 import { money } from "../../shared/lib/format.js";
@@ -21,7 +21,7 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
   const {
     form,
     set,
-    modelos,
+    detail,
     modelo,
     referencia,
     participantes,
@@ -106,27 +106,9 @@ export default function PacoteSolicitacao({ contato, gestao = false }) {
                 />
               </Field>
             </div>
-            <Field
-              label="Modelo base"
-              hint={
-                modelos.length
-                  ? "Referência da coleção. Não representa reserva ou disponibilidade."
-                  : "Os modelos aparecem quando a coleção estiver disponível."
-              }
-            >
-              <Select
-                disabled={!modelos.length}
-                value={form.modeloBase}
-                onChange={set("modeloBase")}
-              >
-                <option value="">Escolher depois</option>
-                {modelos.map((produto) => (
-                  <option key={produto.id} value={produto.id}>
-                    {produto.nome} · {produto.cor}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <SeletorPaginado endpoint="/products/page?category=Terno" auth={false} label="Modelo base" searchLabel="Filtrar trajes" required={false} value={form.modeloBase} selectedLabel={modelo?.nome} onChange={value => set("modeloBase")({ target: { value } })} />
+            <p className="text-xs text-text-sub">Referência da coleção. Não representa reserva ou disponibilidade.</p>
+            {detail.error && <p role="alert">{detail.error.message} <button type="button" onClick={detail.retry}>Tentar novamente</button></p>}
           </section>
           <section className="mb-9" aria-labelledby="planejamento-contato">
             <h3 id="planejamento-contato">Responsável pelo grupo</h3>

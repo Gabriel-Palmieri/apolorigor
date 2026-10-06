@@ -1,6 +1,8 @@
 import { cn } from "../../shared/lib/cn.js";
 import { TIPO_LABEL } from "../../domain/pedidos.js";
 import { fmt } from "../../shared/lib/format.js";
+import { useData } from "../../data/useData.js";
+import { descricaoAprovacao } from "../../domain/rastreio.js";
 const PASSOS_STATUS = [
   {
     key: "Novo",
@@ -30,7 +32,9 @@ const dataHora = (ms) =>
 // tela "Acompanhar pedido", agora usado direto na área do cliente (ao clicar num
 // pedido) e na confirmação de envio. Sem busca por protocolo: recebe o pedido.
 export default function RastreioPedido({ pedido, onVoltar }) {
+  const { trans } = useData();
   if (!pedido) return null;
+  const transaction = trans.find(row => row.id === pedido.transId) || pedido.transacao;
   const recusado = pedido.status === "Recusado";
   const etapaAtual = PASSOS_STATUS.findIndex((s) => s.key === pedido.status);
   return (
@@ -132,7 +136,7 @@ export default function RastreioPedido({ pedido, onVoltar }) {
                       done ? "text-text-sub" : "text-text-muted",
                     )}
                   >
-                    {s.d}
+                    {s.key === "Aprovado" && pedido.status === "Aprovado" ? descricaoAprovacao(transaction, pedido.tipo) : s.d}
                   </p>
                 </div>
               </li>

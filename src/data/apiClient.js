@@ -10,7 +10,7 @@ export class ApiError extends Error {
   }
 }
 let refreshing;
-async function send(path, { method = "GET", body, token, signal, timeoutMs = 20000 } = {}) {
+async function send(path, { method = "GET", body, token, signal, timeoutMs = 20000, idempotencyKey } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   const abort = () => controller.abort();
@@ -22,6 +22,7 @@ async function send(path, { method = "GET", body, token, signal, timeoutMs = 200
       method,
       signal: controller.signal,
       headers: {
+        ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
         ...(body !== undefined && !multipart ? { "Content-Type": "application/json" } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },

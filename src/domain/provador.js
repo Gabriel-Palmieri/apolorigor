@@ -1,8 +1,10 @@
 export const MAX_FOTO_BYTES = 10 * 1024 * 1024;
 export const TIPOS_FOTO = ['image/jpeg', 'image/png', 'image/webp'];
 
+/** @template {{ categoria: string }} T @param {T[]} produtos */
 export const ternosParaProva = produtos => produtos.filter(produto => produto.categoria === 'Terno');
 
+/** @param {{ type: string, size: number } | null | undefined} file */
 export function validarFoto(file) {
   if (!file) throw new Error('Escolha uma foto para continuar.');
   if (!TIPOS_FOTO.includes(file.type)) throw new Error('Envie uma foto JPG, PNG ou WebP. Se a foto está em HEIC, exporte-a como JPG.');
@@ -10,7 +12,9 @@ export function validarFoto(file) {
   if (file.size === 0) throw new Error('Esse arquivo está vazio. Escolha outra foto.');
 }
 
+/** @param {unknown} error */
 export function mensagemCamera(error) {
+  /** @type {Record<string, string>} */
   const mensagens = {
     NotAllowedError: 'O acesso à câmera não foi autorizado. Permita o acesso nas configurações do navegador ou envie uma foto.',
     NotFoundError: 'Não encontramos uma câmera neste dispositivo. Você pode enviar uma foto.',
@@ -18,5 +22,6 @@ export function mensagemCamera(error) {
     OverconstrainedError: 'Esta câmera não suporta a configuração solicitada. Tente outra câmera ou envie uma foto.',
     SecurityError: 'O navegador bloqueou a câmera. Você pode enviar uma foto.'
   };
-  return mensagens[error?.name] || 'Não foi possível abrir a câmera. Tente novamente ou envie uma foto.';
+  const name = error && typeof error === 'object' && 'name' in error && typeof error.name === 'string' ? error.name : '';
+  return mensagens[name] || 'Não foi possível abrir a câmera. Tente novamente ou envie uma foto.';
 }

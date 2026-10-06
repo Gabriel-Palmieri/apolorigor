@@ -6,10 +6,11 @@ import { Button } from "../../shared/ui/botoes/Button.jsx";
 import { useOutletContext } from "react-router-dom";
 import Confirmacao from "../../features/pedidos/Confirmacao.jsx";
 export default function Pedido() {
-  const { rascunho, go, cliente } = useOutletContext();
-  const { form, erros, feito, busy, set, enviar, r } = usePedidoForm(
+  const { rascunho, descartarRascunho, go, cliente } = useOutletContext();
+  const { form, erros, feito, busy, set, enviar, r, retrying } = usePedidoForm(
     cliente,
     rascunho,
+    descartarRascunho,
   );
   if (!rascunho && !feito) {
     return (
@@ -41,6 +42,7 @@ export default function Pedido() {
   }
   return (
     <PedidoCheckout
+      retrying={retrying}
       form={form}
       erros={erros}
       busy={busy}

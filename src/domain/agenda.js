@@ -1,18 +1,22 @@
+/** @param {import("./types").CalendarItem[]} itens */
 function categoriaBreakdown(itens) {
+  /** @type {Record<string, number>} */
   const m = {};
   itens.forEach(i => {
     m[i.categoria] = (m[i.categoria] || 0) + 1;
   });
   return Object.entries(m).sort((a, b) => b[1] - a[1]);
 }
+/** @param {Pick<import("./types").CatalogProduct, "id" | "nome" | "categoria">[]} produtos @param {import("./types").CalendarTransaction[]} trans @returns {import("./types").CalendarEvent[]} */
 function buildEventos(produtos, trans) {
   const pMap = new Map(produtos.map(p => [p.id, p]));
+  /** @type {Omit<import("./types").CalendarEvent, "nPecas" | "breakdown">[]} */
   const eventos = [];
   trans.forEach(t => {
-    if (t.devolvido !== false) return; // só locações em aberto
+    if (t.devolvido !== false || !t.retirada || !t.devolucao) return; // só locações em aberto
 
     if (t.tipo === 'locacao_avulsa') {
-      const p = pMap.get(t.produtoId);
+      const p = pMap.get(t.produtoId || "");
       eventos.push({
         transId: t.id,
         tipo: 'avulsa',
@@ -32,7 +36,7 @@ function buildEventos(produtos, trans) {
     }
     if (t.tipo === 'locacao_padronizada') {
       const itens = (t.integrantes || []).filter(i => !i.devolvido).map(i => {
-        const p = pMap.get(i.produtoId);
+        const p = pMap.get(i.produtoId || "");
         return {
           produtoId: i.produtoId ?? null,
           nome: p?.nome || '—',
@@ -60,10 +64,12 @@ function buildEventos(produtos, trans) {
     breakdown: categoriaBreakdown(e.itens)
   }));
 }
+/** @param {import("./types").CalendarEvent[]} eventos @param {string} dstr */
 function aggDia(eventos, dstr) {
   const saidas = eventos.filter(e => e.retirada === dstr);
   const retornos = eventos.filter(e => e.devolucao === dstr);
   const ativos = eventos.filter(e => e.retirada <= dstr && dstr <= e.devolucao);
+  /** @param {import("./types").CalendarEvent[]} arr */
   const sum = arr => arr.reduce((s, e) => s + e.nPecas, 0);
   return {
     saidas,

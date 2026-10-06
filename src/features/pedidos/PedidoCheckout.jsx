@@ -9,7 +9,7 @@ import { money } from "../../shared/lib/format.js";
 import { fmtDate } from "../../shared/lib/format.js";
 import { TIPO_LABEL } from "../../domain/pedidos.js";
 import { Alert } from "../../shared/ui/feedback/Feedback.jsx";
-export default function PedidoCheckout({ form, erros, busy, set, enviar, r, go }) {
+export default function PedidoCheckout({ form, erros, busy, set, enviar, r, go, retrying }) {
   return (
     <Section className="pt-10 desktop:pt-16">
       <Wrap>
@@ -21,6 +21,7 @@ export default function PedidoCheckout({ form, erros, busy, set, enviar, r, go }
         </Lead>
 
         {erros.geral && <Alert>{erros.geral}</Alert>}
+        {retrying && <p role="status">Ao tentar novamente, recuperaremos o envio anterior com os mesmos dados. Consulte seus pedidos antes de iniciar outro.</p>}
         <div
           className={cn(
             "grid grid-cols-1 desktop:grid-cols-summary gap-rhythm items-start",
@@ -69,6 +70,7 @@ export default function PedidoCheckout({ form, erros, busy, set, enviar, r, go }
               hint="Ajustes conhecidos, cor de referência, ocasião."
             >
               <TextArea
+                readOnly={retrying}
                 value={form.observacoes}
                 onChange={set("observacoes")}
                 placeholder="Ex.: casamento no dia 14, prefiro lapela fina, já sei que preciso encurtar a barra."

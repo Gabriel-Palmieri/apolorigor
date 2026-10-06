@@ -85,23 +85,13 @@ function EventoCard({ e, cap, onSelectDay }) {
     </div>
   );
 }
-function VisaoAgenda({ eventos, cap, onSelectDay }) {
-  const [q, setQ] = useState("");
+function VisaoAgenda({ eventos, cap, onSelectDay, search, onSearch }) {
+  const q = search || "";
   const [tipo, setTipo] = useState("todos");
   const grupos = useMemo(() => {
-    const s = q.trim().toLowerCase();
     const filtrados = eventos.filter((e) => {
       if (tipo !== "todos" && e.tipo !== tipo) return false;
-      if (!s) return true;
-      return (
-        e.titulo.toLowerCase().includes(s) ||
-        e.subtitulo.toLowerCase().includes(s) ||
-        e.itens.some(
-          (i) =>
-            i.nome.toLowerCase().includes(s) ||
-            i.quem.toLowerCase().includes(s),
-        )
-      );
+      return true;
     });
     const map = new Map();
     filtrados.forEach((e) => {
@@ -120,13 +110,18 @@ function VisaoAgenda({ eventos, cap, onSelectDay }) {
           ),
         ),
       ]);
-  }, [eventos, q, tipo]);
+  }, [eventos, tipo]);
   return (
     <div>
+      <p className="text-xs text-text-sub">
+        Eventos desta página, agrupados por fim de semana. Consulte Dia, Semana
+        ou Mês para os totais de capacidade.
+      </p>
       <div className="flex gap-2 mb-4 flex-wrap">
         <input
           value={q}
-          onChange={(ev) => setQ(ev.target.value)}
+          onChange={(ev) => onSearch(ev.target.value)}
+          maxLength={120}
           placeholder="Buscar evento, noivos, peça ou pessoa..."
           className="flex-1 min-w-56 py-2 px-2.5 bg-input-bg border border-border rounded-card text-text text-compact outline-none font-sans"
         />
@@ -158,12 +153,6 @@ function VisaoAgenda({ eventos, cap, onSelectDay }) {
         const sat = parse(key),
           sun = addDays(sat, 1);
         const totalPecas = evs.reduce((acc, e) => acc + e.nPecas, 0);
-        const porDia = {};
-        evs.forEach((e) => {
-          porDia[e.retirada] = (porDia[e.retirada] || 0) + e.nPecas;
-        });
-        const pico = Math.max(0, ...Object.values(porDia));
-        const over = pico > cap;
         const label =
           sat.getMonth() === sun.getMonth()
             ? `${sat.getDate()}–${sun.getDate()} ${MES_ABBR[sat.getMonth()]}`
@@ -180,9 +169,6 @@ function VisaoAgenda({ eventos, cap, onSelectDay }) {
               <div className="flex gap-2 items-center">
                 <Chip textClassName="text-blue-fg">{evs.length} evento(s)</Chip>
                 <Chip textClassName="text-gold">{totalPecas} peças</Chip>
-                <Chip textClassName={over ? "text-red-fg" : "text-green-fg"}>
-                  pico {pico}/{cap}
-                </Chip>
               </div>
             </div>
             <div className="grid grid-cols-panels gap-2.5">

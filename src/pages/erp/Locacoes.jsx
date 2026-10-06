@@ -5,11 +5,13 @@ import { Button } from "../../shared/ui/botoes/Button.jsx";
 import TransacaoLista from "../../features/locacoes/TransacaoLista.jsx";
 import FormularioTransacao from "../../features/locacoes/FormularioTransacao.jsx";
 import PacotesPadronizados from "../../features/locacoes/PacotesPadronizados.jsx";
+import { useListaPaginada } from "../../features/listas/useListaPaginada.js";
 export default function Locacoes() {
   const { trans } = useData();
   const [editing, setEditing] = useState(null);
   const [params, setParams] = useSearchParams();
   const pacotes = params.get("aba") === "pacotes";
+  const list = useListaPaginada("trans");
   return (
     <div className="max-w-6xl mx-auto">
       <nav
@@ -41,7 +43,7 @@ export default function Locacoes() {
             </p>
             <Button onClick={() => setEditing("new")}>Nova operação</Button>
           </div>
-          <TransacaoLista rows={trans} admin onEdit={setEditing} />
+          <TransacaoLista rows={trans} admin onEdit={setEditing} paged={list} />
         </>
       )}
       {editing && (

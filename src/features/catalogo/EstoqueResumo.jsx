@@ -1,6 +1,6 @@
 import { resumoAcervo } from "../../domain/catalogo.js";
-export default function EstoqueResumo({ produtos }) {
-  const resumo = resumoAcervo(produtos);
+export default function EstoqueResumo({ produtos, summary }) {
+  const resumo = summary || resumoAcervo(produtos);
   return (
     <dl className="m-0 mb-5 py-5 border-y border-border grid grid-cols-2 desktop:grid-cols-4 gap-5">
       {[

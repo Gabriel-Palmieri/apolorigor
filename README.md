@@ -6,7 +6,7 @@ Na vitrine, o cliente conhece os modelos, consulta tamanhos e disponibilidade, p
 
 ## Integração com o backend
 
-O frontend está conectado à API NestJS existente. O backend é a fonte de verdade para autenticação, permissões, estoque, preços, pedidos, transações e pagamentos. A integração não altera o código da API.
+O frontend está conectado à API NestJS em `../apolloapi`. O backend é a fonte de verdade para autenticação, permissões, estoque, preços, pedidos, transações e pagamentos. As correções de contrato documentadas abaixo devem ser implantadas nos dois projetos.
 
 | Área | Recursos conectados |
 | --- | --- |
@@ -18,19 +18,21 @@ O frontend está conectado à API NestJS existente. O backend é a fonte de verd
 | Operações | Criação e edição de rascunhos, confirmação, cancelamento, retirada, entrega e devolução |
 | Cliente | Pedidos e transações do próprio usuário; pagamento simulado |
 | Dashboard e agenda | Movimentações confirmadas e relatórios de atraso/conflito da API |
+| Pacotes | Envio público da solicitação e participantes; consulta administrativa |
+| Provador | Geração opcional de prévia com Fal.ai, após consentimento |
 
 Aprovar um pedido cria uma transação em rascunho. Confirmar essa transação compromete o estoque; na venda, a API dá baixa na quantidade. O frontend não executa essa regra nem salva uma cópia comercial em localStorage.
 
 Os pagamentos são simulados, sem cobrança financeira real. Essa condição aparece antes da confirmação na interface.
 
-Pacotes de casamento, participantes, assinaturas e ordens de costura não possuem endpoints nesta API. Suas interfaces foram preservadas com contratação, revelação de traje, cadastro de ordens e mudanças de etapa indisponíveis. A área de retiradas e devoluções permite as operações suportadas, incluindo observações de avarias; não cria ordens de reparo locais.
+Solicitações de pacotes e participantes são salvas pela API. Contratação do pacote, acompanhamento individual, assinaturas e ordens de costura continuam fora do fluxo implementado. A área de retiradas e devoluções permite as operações suportadas, incluindo observações de avarias; não cria ordens de reparo locais.
 
-### Interfaces aguardando integração
+### Pacotes e limites do produto
 
 - Em `/pacote`, o visitante pode preparar os dados do evento, escolher uma referência do catálogo e organizar participantes. A prévia do portal mostra esse planejamento, sem contrato, reserva, pagamento ou status de retirada fictícios.
-- O planejamento usa somente estado React e é descartado ao sair da tela ou recarregar. Não é enviado à API, salvo em localStorage ou convertido em um pedido comercial. A referência de valor multiplica o preço unitário do catálogo pela quantidade prevista e não representa uma proposta de pacote.
+- Antes do envio, o planejamento usa somente estado React e é descartado ao sair ou recarregar. O botão Enviar solicitação envia dados e participantes para `POST /wedding-packages`. O sucesso não confirma contrato, disponibilidade ou reserva. A referência de valor multiplica o preço unitário do catálogo pela quantidade prevista e não representa uma proposta de pacote.
 - Em `/casamento`, a área autenticada do casal preserva as seções de evento, roupas e grupo, com ausência de dados explicitamente indicada. O acesso aparece na conta do cliente.
-- Na gestão, `/sistema/locacoes?aba=pacotes` preserva a visão geral e o planejamento do grupo, reutilizando o mesmo formulário e portal da vitrine.
+- Na gestão, `/sistema/locacoes?aba=pacotes` lista as solicitações da API e permite iniciar um planejamento com o mesmo formulário da vitrine. A lista participa das reconsultas e do botão Atualizar dados. A prévia do portal continua sendo uma apresentação do planejamento.
 - `/sistema/ajustes?aba=costura` preserva as colunas do painel de costura. Não há ordens demonstrativas, arraste ou gravação de etapas. A aba de retiradas e devoluções continua conectada à API.
 - O catálogo separa controles, resumo físico, listagem e edição em componentes próprios. O resumo recolhido do dashboard usa quantidades cadastradas e operações confirmadas ou concluídas; não estima disponibilidade nem apresenta o valor dessas operações como recebimento financeiro.
 
@@ -83,7 +85,25 @@ Os antigos repositórios locais, fixtures comerciais e regras de gravação fora
 
 O cliente HTTP está em `src/data/apiClient.js`. Os serviços enviam somente os campos aceitos pelos DTOs existentes. UUIDs permanecem strings. A API recebe centavos inteiros; a apresentação converte para reais. Datas operacionais permanecem em `YYYY-MM-DD`.
 
-O carregamento percorre as páginas das listagens e mantém um cache em memória. A troca de usuário invalida esse cache; respostas atrasadas não restauram dados de outra sessão. Os serviços reconsultam as listagens depois de uma gravação.
+O carregamento mantém um cache em memória com estado de carregamento, erro e inicialização por recurso. Cada rota solicita suas dependências: estoque usa catálogo; pedidos usa pedidos; perfil não depende das listas comerciais. O contador de pedidos da gestão usa `/orders/summary` em segundo plano. Falha de relatório não impede acessar estoque, e respostas bem-sucedidas são preservadas. A troca de usuário invalida o cache; respostas atrasadas não restauram dados de outra sessão. Os serviços reconsultam os recursos da tela depois de uma gravação. O relatório de conflitos do backend reaproveita uma listagem de reservas com quantidades, sem consultas adicionais por operação; medição de desempenho com banco real continua pendente.
+
+### Paginação da gestão
+
+Catálogo, pedidos, histórico de operações e solicitações de pacotes carregam 20 registros por página. Os endpoints são `/products/admin/page`, `/orders/page`, `/transactions/page` e `/wedding-packages/page`. Retornam `items`, `page`, `pages`, `limit` e `total`; catálogo e pedidos também retornam `summary` com totais globais. O filtro de status dos pedidos, situação do catálogo e buscas de modelo/operação são aplicados no servidor. Mudar um filtro volta à primeira página. Página e filtros ficam na URL e sobrevivem ao recarregamento e ao histórico do navegador.
+
+Uma página parcial não é reutilizada como lista completa ao abrir dashboard, agenda ou outro fluxo. Respostas de páginas antigas são descartadas. Falhas de troca de página ocultam os registros anteriores e permitem tentar novamente. Atualizar a mesma página preserva formulários abertos de operações; se registros desaparecerem, a API ajusta a consulta para a última página existente.
+
+Dashboard, agenda, retiradas/devoluções, seletores de formulário, vitrine e conta do cliente ainda percorrem as páginas necessárias para obter suas listas completas. A paginação dessas áreas e agregações dedicadas permanecem melhorias de escala. Os endpoints antigos continuam retornando arrays; os novos precisam estar disponíveis no backend antes de publicar este frontend.
+
+As consultas também são renovadas ao navegar entre telas e ao retomar a aba. Sessões autenticadas consultam atualizações a cada 30 segundos enquanto a página está visível, sem sobrepor uma consulta em andamento. Conta e gestão oferecem o botão **Atualizar dados**. Isso não é atualização em tempo real: mudanças de outra sessão podem levar até a próxima consulta para aparecer.
+
+Após enviar um pedido com sucesso, o rascunho é descartado tanto da memória quanto do sessionStorage. Em caso de erro, permanece disponível para correção ou nova tentativa. A proteção evita reenviar pelo histórico do navegador; não substitui idempotência de criação no servidor em caso de resposta de rede perdida.
+
+Fotos de catálogo aceitam URLs HTTPS e arquivos de imagem dentro de `/produtos/`, incluindo a subpasta `feminino` e nomes com espaços codificados. Caminhos que saem dessa pasta não são aceitos. O backend deve receber a mesma atualização de contrato para editar os produtos criados pelo seed.
+
+Ao editar, apagar coleção, tecido, cor, linha ou foto envia `null` no PATCH e limpa o campo no backend. Campos omitidos permanecem como estão. Na criação, campos opcionais vazios são omitidos; campos obrigatórios continuam recusando `null`.
+
+Datas de evento dos pacotes usam `YYYY-MM-DD`; o backend rejeita datas inexistentes, datas passadas e `null` explícito. Omitir o campo significa data a definir. O frontend também consegue exibir os timestamps da versão anterior durante a atualização dos dois projetos.
 
 Reserva, baixa e ciclo das operações pertencem ao backend. O frontend valida formulários, consulta disponibilidade e apresenta respostas do servidor. A pasta domain não oferece uma implementação alternativa dessas regras.
 
@@ -113,9 +133,9 @@ São aceitos JPEG, PNG e WebP de até 10 MB. Arquivos vazios, formatos não acei
 
 A câmera não captura áudio. A captura frontal acompanha o espelhamento da prévia. Capturar, fechar, sair da rota ou ocultar a aba encerra os tracks; permissões concluídas depois de cancelar têm o stream liberado. URLs de objetos são revogadas na troca e desmontagem.
 
-A foto permanece na memória; não é salva na sessão nem enviada à API. `useFotoProvador.js` administra a captura, e `Provador.jsx` reúne a foto e o modelo. O blob JPEG e o UUID do produto poderão ser enviados a um futuro serviço de prova virtual; uma URL blob é local ao navegador.
+A foto preparada permanece na memória e não é salva na sessão. `useFotoProvador.js` administra a captura, e `Provador.jsx` reúne a foto e o modelo. Conferir a prévia não envia imagens. Após marcar o consentimento e clicar em Gerar prévia com IA, o frontend envia foto, imagem do traje e consentimento para `POST /virtual-fitting/:productId`, que usa a Fal.ai. A chave do provedor permanece no backend.
 
-A prévia continua sendo uma demonstração de interface. O backend fornecido não possui endpoint de IA para vestir o usuário com o terno. A interface explicita essa limitação. A câmera exige localhost ou HTTPS e autorização do usuário.
+A geração depende de `FAL_KEY`, disponibilidade do provedor e de conseguir obter a imagem do traje pelo navegador (inclusive CORS de URLs externas). O resultado é ilustrativo e não garante tamanho ou caimento. A câmera exige localhost ou HTTPS e autorização do usuário. A geração real e a câmera física ainda precisam de homologação; os testes usam respostas HTTP e stream de câmera controlados, sem chamadas pagas.
 
 ## Verificações
 
@@ -128,7 +148,7 @@ npm run build
 npm run test:e2e
 ```
 
-A arquitetura valida imports, camadas e ciclos. TypeScript tem o escopo definido em tsconfig.json. Os testes de navegador usam Microsoft Edge e precisam de build atualizado; o Playwright inicia o preview.
+A arquitetura valida imports, camadas e ciclos. O typecheck cobre oito módulos JavaScript: adaptadores da API, dependências de dados das rotas, rastreio, provador, datas, formatação, imagens e estados visuais. Os contratos estão em `src/data/contracts.d.ts` e `src/domain/types.d.ts`; `tests/types/contracts.test.ts` verifica tipos aceitos e rejeitados, incluindo UUIDs, centavos, estados e limpeza de opcionais. A configuração permanece em tsconfig.json: componentes React, cliente HTTP e cache ainda não estão integralmente cobertos. Os tipos não validam respostas HTTP em execução nem substituem testes com a API real. Os testes de navegador usam Microsoft Edge e precisam de build atualizado; o Playwright inicia o preview ou reutiliza um preview já ativo.
 
 Os testes de integração interceptam HTTP com contratos e respostas baseados na API existente. Verificam Bearer, UUIDs, centavos, campos permitidos, acesso, renovação de sessão e ações comerciais. Não substituem uma validação com backend e banco configurados nem criam uma API demonstrativa em produção.
 
@@ -138,4 +158,4 @@ A migração inicial separou páginas, layouts, funcionalidades e UI; substituiu
 
 As auditorias Brooks anteriores registraram evolução até 89/100. Essa pontuação é histórica, não uma nova auditoria da integração. A demonstração recebeu correções de persistência, validação e atomicidade; com a conexão, a persistência comercial e suas invariantes passaram ao backend.
 
-O histórico de pontuação está em .brooks-lint-history.json. Toda a documentação do frontend permanece neste README.
+O histórico de pontuação está em .brooks-lint-history.json. A auditoria e o registro das correções estão em [docs/auditoria-fluxos-2026-10-06.md](docs/auditoria-fluxos-2026-10-06.md).

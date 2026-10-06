@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useData } from "../../data/useData.js";
-import { resumoDashboard } from "../../domain/dashboard.js";
 import { Button } from "../../shared/ui/botoes/Button.jsx";
 import Pendencias from "../../features/dashboard/Pendencias.jsx";
 import ProximasMovimentacoes from "../../features/dashboard/ProximasMovimentacoes.jsx";
 import ResumoAcervo from "../../features/dashboard/ResumoAcervo.jsx";
 export default function Dashboard() {
-  const data = useData();
+  const { dashboard } = useData();
   const navigate = useNavigate();
   const agora = new Date();
   const hoje = [
@@ -14,7 +13,8 @@ export default function Dashboard() {
     String(agora.getMonth() + 1).padStart(2, "0"),
     String(agora.getDate()).padStart(2, "0"),
   ].join("-");
-  const { pendencias, proximos } = resumoDashboard(data, hoje);
+  if (!dashboard) return null;
+  const { pendencias, proximos } = dashboard;
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center flex-wrap gap-5 mb-10">
@@ -35,7 +35,7 @@ export default function Dashboard() {
         <Pendencias pendencias={pendencias} />
         <ProximasMovimentacoes eventos={proximos} hoje={hoje} />
       </div>
-      <ResumoAcervo produtos={data.produtos} trans={data.trans} />
+      <ResumoAcervo acervo={dashboard.acervo} operacoes={dashboard.operacoes} />
     </div>
   );
 }

@@ -1,14 +1,17 @@
+import { useListaPaginada } from "../../features/listas/useListaPaginada.js";
+import Paginacao from "../../shared/ui/estrutura/Paginacao.jsx";
 import { Section, Wrap } from "../../shared/ui/estrutura/EstruturaConteudo.jsx";
 import { Display, Lead } from "../../shared/ui/estrutura/Typography.jsx";
 import { cn } from "../../shared/lib/cn.js";
 import CartaoProdutoVitrine from "../../features/catalogo/CartaoProdutoVitrine.jsx";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { useCatalogo } from "../../data/useData.js";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { VITRINES } from "../../domain/vitrine.js";
 import { CATEGORIAS } from "../../domain/catalogo.js";
 export default function Colecao() {
   const CATALOGO = useCatalogo();
+  const paged = useListaPaginada("produtos");
   const { openProduto } = useOutletContext();
   const [params, setParams] = useSearchParams();
   const vitrine = params.get("vitrine") || "todos";
@@ -16,6 +19,7 @@ export default function Colecao() {
   const setFiltro = (key, value) =>
     setParams((current) => {
       const next = new URLSearchParams(current);
+      next.delete("pagina");
       if (value) next.set(key, value);
       else next.delete(key);
       return next;
@@ -28,13 +32,8 @@ export default function Colecao() {
       top: 0,
     });
   }, []);
-  const lista = useMemo(() => {
-    let arr = CATALOGO;
-    const v = VITRINES.find((x) => x.id === vitrine);
-    if (v) arr = arr.filter(v.filtro);
-    if (categoria) arr = arr.filter((p) => p.categoria === categoria);
-    return arr;
-  }, [CATALOGO, vitrine, categoria]);
+  const lista = paged.changingPage ? [] : CATALOGO;
+  const total = paged.pagination?.total || 0;
   const abas = [
     {
       id: "todos",
@@ -95,10 +94,10 @@ export default function Colecao() {
         </div>
 
         <p className="mt-8 mb-6 text-sm text-text-sub" role="status">
-          {lista.length} {lista.length === 1 ? "modelo" : "modelos"}
+          {total} {total === 1 ? "modelo" : "modelos"}
         </p>
 
-        {lista.length === 0 ? (
+        {paged.changingPage ? <p role="status">Carregando modelos…</p> : lista.length === 0 ? (
           <p className="text-text-sub text-sm py-10 px-0">
             Nenhum modelo nesse recorte.{" "}
             <button
@@ -121,6 +120,7 @@ export default function Colecao() {
             ))}
           </div>
         )}
+        <Paginacao pagination={paged.pagination} pending={paged.pending} error={paged.error} onPage={paged.changePage} />
       </Wrap>
     </Section>
   );

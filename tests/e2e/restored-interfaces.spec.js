@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { installApi, ids, order, product, transaction } from "../helpers/api.js";
 
-test("wedding planning keeps participants only in memory and previews the same portal", async ({ page }) => {
+test("unsent wedding planning stays in memory and previews the same portal", async ({ page }) => {
   const state = await installApi(page);
   await page.goto("/pacote");
   await page.getByLabel("Nome dos noivos").fill("João e Ana");
@@ -15,7 +15,7 @@ test("wedding planning keeps participants only in memory and previews the same p
   await editor.getByRole("button", { name: "Usar no planejamento" }).click();
   await expect(editor).toHaveCount(0);
   await expect(page.getByText("Pedro Silva", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Enviar solicitação" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Enviar solicitação" })).toBeEnabled();
   await page.getByRole("button", { name: "Ver prévia do portal" }).click();
   const preview = page.getByRole("dialog", { name: "Prévia do portal do casamento" });
   await expect(preview.getByRole("heading", { name: "João e Ana" })).toBeVisible();
@@ -46,7 +46,7 @@ test("the authenticated wedding portal is reachable without inventing a package"
   expect(state.requests.some(request => /pacote|casamento|group/.test(request.path))).toBe(false);
 });
 
-test("management preserves tailoring and package screens with unavailable writes disabled", async ({ page }) => {
+test("management separates disabled tailoring from available package planning", async ({ page }) => {
   const state = await installApi(page, { role: "ADMIN" });
   await page.goto("/sistema/ajustes");
   await page.getByRole("button", { name: "Costura", exact: true }).click();
@@ -56,14 +56,14 @@ test("management preserves tailoring and package screens with unavailable writes
   await page.getByRole("button", { name: "Retiradas e devoluções" }).click();
   await expect(page.locator(".atelier-board")).toHaveCount(0);
   await page.goto("/sistema/locacoes?aba=pacotes");
-  await expect(page.getByRole("button", { name: "Cadastrar pacote" })).toBeDisabled();
-  await page.getByRole("button", { name: "Preparar planejamento do grupo" }).click();
+  await expect(page.getByRole("button", { name: "Cadastrar pacote" })).toBeEnabled();
+  await page.getByRole("button", { name: "Cadastrar pacote" }).click();
   await expect(page).toHaveURL(/visao=planejamento/);
   await page.getByLabel("Nome dos noivos").fill("Carlos e Maria");
   await page.getByRole("button", { name: "Ver prévia do portal" }).click();
   await expect(page.getByRole("dialog").getByRole("heading", { name: "Carlos e Maria" })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("button", { name: "Cadastrar pacote" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Cadastrar pacote" })).toBeEnabled();
   expect(state.requests.some(request => ["POST", "PATCH", "DELETE"].includes(request.method))).toBe(false);
 });
 

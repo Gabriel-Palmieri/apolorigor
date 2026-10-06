@@ -43,7 +43,8 @@ export default function InicioProvador({ catalogo, go }) {
             </p>
             <Button onClick={() => go("provador")}>Conhecer o provador</Button>
             <p className="home-fitting-demo">
-              Versão de demonstração. A prova com IA ainda não está disponível.
+              A prévia com IA é opcional e depende da sua autorização para
+              enviar as imagens. Ela não substitui a prova presencial.
             </p>
           </div>
         </div>

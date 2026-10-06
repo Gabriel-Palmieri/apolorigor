@@ -7,7 +7,7 @@ export const PASSOS = [
   {
     n: "02",
     t: "Como informo meu tamanho?",
-    d: "No pedido você informa o tamanho de referência. A peça sai da prateleira já reservada no seu nome.",
+    d: "No pedido você informa o tamanho de referência. A reserva depende da disponibilidade e da confirmação da operação pelo ateliê.",
   },
   {
     n: "03",

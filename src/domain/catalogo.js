@@ -9,6 +9,7 @@ export const CATEGORIAS = [
 ];
 
 // Quantidades físicas cadastradas; disponibilidade depende de tamanho e período.
+/** @param {import("./types").CatalogProduct[]} produtos */
 export function resumoAcervo(produtos) {
   return {
     modelos: produtos.length,
@@ -49,11 +50,13 @@ export const NUMERIC_SIZES = Array.from(
 ); // 34..57
 export const LETTER_SIZES = ["PP", "P", "M", "G", "GG", "XG"];
 export const TAM_OPTIONS = [...LETTER_SIZES, ...NUMERIC_SIZES];
+/** @param {string} tam */
 export function sizeFamily(tam) {
   return LETTER_SIZES.includes(tam) ? LETTER_SIZES : NUMERIC_SIZES;
 }
 
 // tamanhos maiores que `tam`, na mesma família, em ordem crescente de proximidade
+/** @param {string} tam */
 export function largerSizes(tam) {
   const fam = sizeFamily(tam);
   const idx = fam.indexOf(tam);

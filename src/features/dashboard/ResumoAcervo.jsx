@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom";
-import { resumoAcervo } from "../../domain/catalogo.js";
-import { resumoOperacoes } from "../../domain/dashboard.js";
 import { money } from "../../shared/lib/format.js";
-export default function ResumoAcervo({ produtos, trans }) {
-  const acervo = resumoAcervo(produtos);
-  const operacoes = resumoOperacoes(trans);
+export default function ResumoAcervo({ acervo, operacoes }) {
   const valores = [
     ["Modelos cadastrados", acervo.modelos],
     ["Modelos ativos", acervo.ativos],

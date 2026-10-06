@@ -1,19 +1,20 @@
 import { Badge } from "../../shared/ui/feedback/Feedback.jsx";
 import { PEDIDO_MAP } from "../../shared/ui/feedback/status.js";
 import { Button } from "../../shared/ui/botoes/Button.jsx";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { TIPO_LABEL } from "../../domain/pedidos.js";
 import { money } from "../../shared/lib/format.js";
 import RastreioPedido from "../pedidos/RastreioPedido.jsx";
 export function MeusPedidos({ pedidos, go }) {
   const { protocolo } = useParams();
   const navigate = useNavigate();
+  const { search } = useLocation();
   const aberto = pedidos.find((p) => p.protocolo === protocolo);
   if (protocolo && !aberto)
     return (
       <p role="status">
         Pedido não encontrado.{" "}
-        <Button onClick={() => navigate("/conta/pedidos")}>
+        <Button onClick={() => navigate("/conta/pedidos" + search)}>
           Voltar aos pedidos
         </Button>
       </p>
@@ -22,7 +23,7 @@ export function MeusPedidos({ pedidos, go }) {
     return (
       <RastreioPedido
         pedido={aberto}
-        onVoltar={() => navigate("/conta/pedidos")}
+        onVoltar={() => navigate("/conta/pedidos" + search)}
       />
     );
   if (!pedidos.length)
@@ -37,7 +38,7 @@ export function MeusPedidos({ pedidos, go }) {
       {pedidos.map((p) => (
         <button
           key={p.id}
-          onClick={() => navigate("/conta/pedidos/" + p.protocolo)}
+          onClick={() => navigate("/conta/pedidos/" + p.protocolo + search)}
           className="w-full border border-border bg-card p-5 font-sans text-left"
         >
           <div className="flex justify-between items-start gap-4 flex-wrap">

@@ -42,5 +42,16 @@
       "suggestion": 1
     },
     "scope": "Estado final da reorganização: grafo AST completo dos 132 módulos JS/JSX; leitura dirigida das fronteiras, estoque, operações, persistência e sessão; exemplos de invariantes executados em memória."
+  },
+  {
+    "date": "2026-10-06",
+    "mode": "Architecture Audit",
+    "score": 59,
+    "findings": {
+      "critical": 0,
+      "warning": 8,
+      "suggestion": 1
+    },
+    "scope": "Frontend apolorigor e backend apolloapi; estrutura e fluxos fora de pagamentos. Escopo ampliado, sem comparacao direta com auditorias anteriores. Relatorio docs/auditoria-fluxos-2026-10-06.md."
   }
 ]

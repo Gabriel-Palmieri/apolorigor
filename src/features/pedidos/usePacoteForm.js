@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useCatalogo } from "../../data/useData.js";
+import { useRequest } from "../../data/useRequest.js";
+import { productFromApi } from "../../data/adapters.js";
 export const PAPEIS_DO_GRUPO = ["Noivo", "Padrinho", "Pai", "Pajem", "Outro"];
 
 // Planejamento efêmero da interface: não cria pedidos, contratos ou reservas.
 export function usePacoteForm(contato) {
-  const catalogo = useCatalogo();
-  const modelos = catalogo.filter((produto) => produto.categoria === "Terno");
   const [form, setForm] = useState({
     noivos: "",
     dataEvento: "",
@@ -19,8 +18,8 @@ export function usePacoteForm(contato) {
   const [participantes, setParticipantes] = useState([]);
   const set = (key) => (event) =>
     setForm((current) => ({ ...current, [key]: event.target.value }));
-  const modelo =
-    modelos.find((produto) => produto.id === form.modeloBase) || null;
+  const detail = useRequest(form.modeloBase ? "/products/" + encodeURIComponent(form.modeloBase) : null, false);
+  const modelo = detail.data ? productFromApi(detail.data) : null;
   const quantidade = Number(form.nIntegrantes);
   const referencia =
     modelo &&
@@ -45,7 +44,7 @@ export function usePacoteForm(contato) {
   return {
     form,
     set,
-    modelos,
+    detail,
     modelo,
     referencia,
     participantes,
