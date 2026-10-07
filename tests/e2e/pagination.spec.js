@@ -35,7 +35,7 @@ test("stock requests one page, keeps global totals and navigates with history", 
   ).toEqual(["1"]);
   expect(
     state.requests.some(
-      (r) => r.path === "/transactions/dashboard" || r.path === "/orders",
+      (r) => r.path === "/products/admin/all" || r.path === "/orders",
     ),
   ).toBe(false);
   await pager(page).getByRole("button", { name: "Próxima" }).click();
@@ -219,7 +219,7 @@ test("dashboard uses global aggregates after viewing a partial stock page", asyn
   await expect(page.getByRole("button", { name: /Modelo/ })).toHaveCount(5);
   await page.getByRole("link", { name: "Dashboard", exact: true }).click();
   await expect(page.locator(".dashboard-summary")).toBeVisible();
-  expect(state.requests.some((r) => r.path === "/products/admin/all")).toBe(
+  expect(state.requests.some((r) => r.path === "/transactions/dashboard")).toBe(
     true,
   );
   await page

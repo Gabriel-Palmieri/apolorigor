@@ -3,7 +3,7 @@ import { installApi, ids, order, transaction, client } from "../helpers/api.js";
 
 test("public home remains composed when the API is offline and retries inside the collection", async ({ page }) => {
   const state = await installApi(page);
-  await page.route("**/api/products?*", route => route.abort("failed"));
+  await page.route("**/api/products/page?*", route => route.abort("failed"));
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Vestir a ocasião." })).toBeVisible();
   await expect(page.locator(".connection-status")).toHaveCount(0);
@@ -20,7 +20,7 @@ test("public home remains composed when the API is offline and retries inside th
     });
     await page.screenshot({ path: ".validation.local/home-offline-" + width + ".png" });
   }
-  await page.unroute("**/api/products?*");
+  await page.unroute("**/api/products/page?*");
   await page.locator("#colecao-preview").getByRole("button", { name: "Tentar novamente" }).click();
   await expect(page.getByRole("button", { name: /Terno Oxford/ })).toBeVisible();
   expect(state.requests.some(request => request.path === "/auth/me")).toBe(false);
@@ -50,7 +50,7 @@ test("capture the current dashboard without requiring a real account or a live A
     { ...client, id: "30000000-0000-4000-8000-000000000003", name: "André Tavares" },
     { ...client, id: "30000000-0000-4000-8000-000000000004", name: "Lucas Amaral" },
   ];
-  await installApi(page, { role: "ADMIN", orders: [order(), order({ id: "40000000-0000-4000-8000-000000000002", status: "UNDER_REVIEW" })],
+  await installApi(page, { role: "ADMIN", profiles: people, orders: [order(), order({ id: "40000000-0000-4000-8000-000000000002", status: "UNDER_REVIEW" })],
     transactions: people.map((person, index) => transaction({
       id: "50000000-0000-4000-8000-00000000000" + (index + 1),
       profileId: person.id, status: "CONFIRMED",

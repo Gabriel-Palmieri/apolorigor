@@ -18,7 +18,7 @@ test("direct sale uses registered customer, variant UUID and integer cents", asy
   await page.goto("/sistema/locacoes");
   await page.getByRole("button", { name: "Nova operação" }).click();
   await page.getByRole("combobox", { name: "Modalidade", exact: true }).selectOption("SALE");
-  await page.getByLabel("Cliente cadastrado").selectOption(ids.client);
+  await page.getByRole("combobox", { name: "Cliente cadastrado", exact: true }).selectOption(ids.client);
   await page.getByRole("combobox", { name: "Modelo", exact: true }).selectOption(ids.product);
   await page.getByRole("combobox", { name: "Tamanho", exact: true }).selectOption(ids.variant);
   await page.getByLabel("Valor em reais").fill("950.25");

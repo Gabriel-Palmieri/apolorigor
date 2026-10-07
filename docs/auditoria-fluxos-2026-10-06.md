@@ -265,3 +265,28 @@ Na interface, filtros e página ficam na URL, com retorno à primeira página ao
 A primeira execução completa do navegador teve 65 aprovados em 66. O teste restante voltava antes de a home terminar de montar; foi sincronizado com a navegação concluída. Após os ajustes, **21/21 testes de navegador selecionados** passaram: nove cenários de paginação e doze regressões de pedidos/operações. Cenários com 21–45 registros verificam quantidade de requisições, filtros além da primeira página, histórico, atualização, redução da lista, erro/retry e isolamento do cache. Não foram feitos testes com banco real nem chamadas externas pagas.
 
 **Pendências e implantação:** publicar o backend com os novos endpoints antes deste frontend. Dashboard, agenda, retiradas/devoluções, seletores, vitrine e conta do cliente ainda usam listagens completas; paginação/agregações específicas dessas áreas e medição de consultas com volume real permanecem pendentes. Homologação de serviços reais e funcionalidades futuras já descritas nas etapas anteriores continuam fora desta entrega. Não houve publicação, migration ou seed.
+
+
+## Implementação — quinta etapa (07/10/2026)
+
+O usuário solicitou as três melhorias de código restantes e, depois, adiou explicitamente a aplicação da migration e a publicação. Esta etapa cobre implementação e verificação local. As pendências históricas de paginação e idempotência das etapas anteriores são atualizadas por este registro.
+
+| Área | Resultado |
+| --- | --- |
+| Vitrine e provador | Páginas de 20 modelos; categoria e ocasião filtradas no servidor. A home solicita seis destaques. Detalhes usam o ID, inclusive fora da página carregada. |
+| Conta do cliente | Pedidos e operações têm páginas independentes. Protocolos antigos são resolvidos no servidor dentro do escopo da conta. |
+| Retiradas/devoluções | Filtro de locações confirmadas no servidor, páginas de 20 operações e total global de atrasos. |
+| Formulários | Seletores paginados de clientes e modelos, busca remota, seleção preservada durante a busca e recuperação de falhas. |
+| Dashboard | Agregações globais de acervo, valores e filas; somente cinco próximas movimentações no resultado. |
+| Agenda | Totais diários agregados no servidor em janelas de até 42 dias, separados dos detalhes paginados. Totais não são calculados apenas sobre a página atual. |
+| Conflitos | Uma leitura de reservas; intervalos sobrecarregados calculados uma vez por variante, com busca binária por reserva, evitando recalcular toda a ocupação para cada registro. |
+| Tipos | CheckJs estrito ampliado de 8 para 17 módulos JavaScript, cobrindo todos os módulos de domínio, navegação, calendário e persistência da tentativa, além do escopo anterior. Asserções negativas verificam quantidades, datas e modalidades inválidas. |
+| Idempotência | Chave UUID por rascunho e corpo da tentativa preservado por conta na aba. Repetição recupera o pedido original; chave com corpo diferente recebe 409. Índice único por conta/chave protege a persistência; o serviço recupera o vencedor após uma colisão concorrente. |
+
+As telas atuais não dependem das listagens completas antigas. Os endpoints legados continuam disponíveis. Consultas auxiliares descartam respostas de rota/conta anterior, permitem nova tentativa e atualizam ao retomar a aba; consultas autenticadas também renovam a cada 30 segundos enquanto visíveis.
+
+**Verificação local:** frontend com 31 testes unitários aprovados, lint, typecheck estrito, arquitetura de 134 módulos sem ciclos e build aprovados. Backend com build e 12 testes de contrato aprovados. A primeira rodada de navegador teve 74/80 aprovados: foram corrigidas expectativas antigas de endpoints, seletores dos testes novos e identificação dos controles de paginação. Na rodada completa com o build final, 77/81 passaram; os quatro restantes eram seletores de testes antigos que passaram a encontrar também a navegação dos seletores paginados. Após restringi-los ao papel combobox, as três suítes afetadas passaram 20/20, incluindo os quatro casos. Nenhum caso permanece falhando nas execuções finais; não se trata de uma única execução 81/81. Os seis cenários novos de escala/recuperação passaram na rodada completa, incluindo resposta perdida, recarga, modelo desativado, páginas independentes, busca além da primeira página, totais diários globais e recuperação de falha do seletor. Captura do formulário de casamento em 390 px foi inspecionada, sem corte horizontal.
+
+**Limites da verificação:** contratos usam Nest e regras reais com persistência/autenticação substituídas; o navegador usa API simulada. O teste de concorrência exercita a recuperação de violação única simulada, não duas transações reais. Agregação SQL, índices e isolamento no PostgreSQL real dependem da homologação adiada. A compilação cobre o backend, mas a execução de Vitest/oxlint não foi declarada aprovada nesta etapa devido ao bloqueio nativo já registrado.
+
+**Banco e publicação:** a migration 20261006000000_order_idempotency está preparada e NÃO foi aplicada. Não houve seed, recriação de banco ou deploy. Quando o usuário decidir publicar, a ordem é aplicar a migration, publicar o backend e publicar o frontend, seguida da conferência no ambiente. A idempotência persistente exige o índice da migration. Portal individual de casamento, costura e demais itens fora do escopo atual não são declarados implementados.

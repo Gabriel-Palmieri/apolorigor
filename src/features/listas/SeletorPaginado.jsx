@@ -57,11 +57,13 @@ export default function SeletorPaginado({
         </Select>
       </Field>
       {result.error && (
-        <button type="button" onClick={result.retry}>
+        <p role="alert">{result.error.message} <button type="button" onClick={result.retry}>
           Tentar novamente
-        </button>
+        </button></p>
       )}
+      {result.loading && !result.data && <p role="status">Carregando opções…</p>}
       <Paginacao
+        label={`Paginação de ${label.toLowerCase()}`}
         pagination={result.data}
         pending={result.loading}
         error={result.error?.message}

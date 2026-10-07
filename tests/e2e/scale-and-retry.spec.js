@@ -10,13 +10,13 @@ test("lost order response reuses the same request after reload without a second 
   await page.getByRole("button", { name: "M", exact: true }).click();
   await expect(page.getByRole("dialog").getByRole("status")).toContainText("3 peça(s)");
   await page.getByRole("button", { name: "Continuar para o pedido" }).click();
-  await page.getByLabel("Observações", { exact: true }).fill("Ajustar a barra");
+  await page.getByRole("textbox", { name: "Observações", exact: true }).fill("Ajustar a barra");
   await page.getByRole("button", { name: "Enviar pedido", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("conectar");
   expect(state.orders).toHaveLength(1);
   await page.reload();
-  await expect(page.getByLabel("Observações", { exact: true })).toHaveValue("Ajustar a barra");
-  await expect(page.getByLabel("Observações", { exact: true })).toHaveAttribute("readonly", "");
+  await expect(page.getByRole("textbox", { name: "Observações", exact: true })).toHaveValue("Ajustar a barra");
+  await expect(page.getByRole("textbox", { name: "Observações", exact: true })).toHaveAttribute("readonly", "");
   // Recover the accepted request even if the model is no longer in the catalogue.
   state.products[0].active = false;
   await page.getByRole("button", { name: "Enviar pedido", exact: true }).click();
@@ -66,16 +66,16 @@ test("remote selectors search beyond their first page and preserve the chosen mo
   await page.goto("/sistema/locacoes");
   await page.getByRole("button", { name: /Nova operação/ }).click();
   await page.getByLabel("Filtrar pessoas").fill("Pessoa 000");
-  await expect(page.getByLabel("Cliente cadastrado").getByRole("option", { name: /Pessoa 000/ })).toHaveCount(1);
-  await page.getByLabel("Cliente cadastrado").selectOption("client-0");
+  await expect(page.getByRole("combobox", { name: "Cliente cadastrado", exact: true }).getByRole("option", { name: /Pessoa 000/ })).toHaveCount(1);
+  await page.getByRole("combobox", { name: "Cliente cadastrado", exact: true }).selectOption("client-0");
   await page.getByLabel("Filtrar trajes").fill("Traje 000");
-  await expect(page.getByLabel("Modelo", { exact: true }).getByRole("option", { name: "Traje 000" })).toHaveCount(1);
-  await page.getByLabel("Modelo", { exact: true }).selectOption(ids.product);
-  await expect(page.getByLabel("Tamanho").getByRole("option", { name: "M", exact: true })).toHaveCount(1);
-  await page.getByLabel("Tamanho").selectOption(ids.variant);
+  await expect(page.getByRole("combobox", { name: "Modelo", exact: true }).getByRole("option", { name: "Traje 000" })).toHaveCount(1);
+  await page.getByRole("combobox", { name: "Modelo", exact: true }).selectOption(ids.product);
+  await expect(page.getByRole("combobox", { name: "Tamanho", exact: true }).getByRole("option", { name: "M", exact: true })).toHaveCount(1);
+  await page.getByRole("combobox", { name: "Tamanho", exact: true }).selectOption(ids.variant);
   await page.getByLabel("Filtrar trajes").fill("Traje 044");
-  await expect(page.getByLabel("Modelo", { exact: true })).toHaveValue(ids.product);
-  await expect(page.getByLabel("Tamanho")).toHaveValue(ids.variant);
+  await expect(page.getByRole("combobox", { name: "Modelo", exact: true })).toHaveValue(ids.product);
+  await expect(page.getByRole("combobox", { name: "Tamanho", exact: true })).toHaveValue(ids.variant);
   expect(state.requests.some(row => ["/profiles", "/products/admin/all"].includes(row.path))).toBe(false);
 });
 
@@ -90,4 +90,21 @@ test("calendar daily totals include reservations beyond the visible page", async
   await expect(pager(page)).toContainText("Página 2 de 3");
   await expect(page.getByText("45 operação(ões)")).toHaveCount(3);
   expect(state.requests.some(row => ["/transactions", "/products/admin/all", "/orders", "/profiles"].includes(row.path))).toBe(false);
+  state.transactions.push(transaction({ id: "new-reservation", status: "CONFIRMED", startDate: day, endDate: day }));
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect(page.getByText("46 operação(ões)")).toHaveCount(3);
+});
+
+test("a failed remote selector explains the error and can recover", async ({ page }) => {
+  await installApi(page, { role: "ADMIN" });
+  let unavailable = true;
+  await page.route("**/api/profiles/page?*", route => unavailable
+    ? route.fulfill({ status: 503, json: { message: "Busca de clientes indisponível" } })
+    : route.fallback());
+  await page.goto("/sistema/locacoes");
+  await page.getByRole("button", { name: "Nova operação", exact: true }).click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText("Busca de clientes indisponível");
+  unavailable = false;
+  await page.getByRole("dialog").getByRole("button", { name: "Tentar novamente" }).click();
+  await expect(page.getByRole("combobox", { name: "Cliente cadastrado" }).getByRole("option", { name: /Cliente Teste/ })).toHaveCount(1);
 });

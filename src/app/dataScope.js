@@ -14,16 +14,11 @@ export function resourcesForRoute(pathname, search = "") {
   if (pathname === "/sistema/ajustes") return ["trans"];
   if (pathname.endsWith("dashboard")) return ["dashboard"];
   if (pathname.endsWith("anuario")) return [];
-  if (pathname.startsWith("/sistema")) {
-    /** @type {import('../data/contracts').ResourceKey[]} */
-    const keys = ["produtos", "pedidos", "trans", "profiles"];
-    if (pathname.endsWith("dashboard") || pathname.endsWith("ajustes")) keys.push("conflicts");
-    return keys;
-  }
+  if (pathname.startsWith("/sistema")) return [];
   if (pathname.startsWith("/conta/pedidos")) return ["pedidos", "trans"];
   if (pathname === "/pedido" || pathname === "/pacote") return [];
   if (/^\/(conta|entrar|auth|casamento)(\/|$)/.test(pathname)) return [];
-  return ["produtos"];
+  return pathname === "/" || pathname.startsWith("/colecao") || pathname === "/provador" ? ["produtos"] : [];
 }
 
 /** @param {string} pathname @param {string} search */
@@ -48,9 +43,9 @@ export function pagesForRoute(pathname, search = "") {
   if (pathname === "/sistema/ajustes") return params.get("aba") === "costura" ? {} : { trans: { page, limit: 20, q, type: "RENTAL", status: "CONFIRMED" } };
   if (pathname.startsWith("/conta/pedidos")) {
     /** @param {string} key */
-    const readPage = (key) => Math.max(1, Math.floor(Number(params.get(key)) || 1));
+    const readPage = (key) => { const value = Number(params.get(key)); return Number.isSafeInteger(value) && value > 0 ? value : 1; };
     const protocol = pathname.split("/")[3];
-    return { pedidos: { page: readPage("paginaPedidos"), limit: 20, ...(protocol ? { protocol: decodeURIComponent(protocol) } : {}) }, trans: { page: readPage("paginaOperacoes"), limit: 20, q: (params.get("buscaOperacoes") || "").trim().slice(0, 120) } };
+    return { pedidos: { page: readPage("paginaPedidos"), limit: 20, ...(protocol ? { protocol: protocol.slice(0, 64) } : {}) }, trans: { page: readPage("paginaOperacoes"), limit: 20, q: (params.get("buscaOperacoes") || "").trim().slice(0, 120) } };
   }
   if (pathname === "/" || pathname.startsWith("/colecao") || pathname === "/provador") {
     const category = pathname === "/provador" ? "Terno" : params.get("categoria");

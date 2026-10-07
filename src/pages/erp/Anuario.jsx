@@ -38,7 +38,7 @@ export default function Anuario() {
     return buildEventos(rows.map(row => productFromApi({ ...row.variant.product, variants: [] })), rows.map(row => transactionFromApi(row, [], [])));
   }, [detail.data]);
   const selectDay = day => { setSelected(day); setPage(1); };
-  const changeMode = mode => { setModo(mode); setPage(1); };
+  const changeMode = mode => { setModo(mode); setPage(1); if (mode === "mes" || mode === "semana") setSelected(iso(cursor)); };
   const gridEvents = modo === "dia" ? eventos : [];
   const nav = (dir) => {
     const c = new Date(cursor);

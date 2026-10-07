@@ -24,7 +24,7 @@ function Bloco({ title, rows, date }) {
   );
 }
 export default function VisaoDia({ dstr, eventos, counts, cap }) {
-  const { saidas, retornos, nSaidas, nRetornos, nAtivos } = {
+  const { saidas, retornos, ativos, nSaidas, nRetornos, nAtivos } = {
     ...aggDia(eventos, dstr),
     ...counts?.[dstr],
   };
@@ -51,6 +51,8 @@ export default function VisaoDia({ dstr, eventos, counts, cap }) {
         />
       </div>
       <CapacityBar n={nSaidas} cap={cap} label="Carga prevista de retiradas" />
+      <p className="text-xs text-text-sub">Os totais consideram todas as reservas. As listas abaixo mostram as operações desta página.</p>
+      <Bloco title="Locações nesta página" rows={ativos} />
       <Bloco title="Retiradas do dia" rows={saidas} />
       <Bloco title="Devoluções do dia" rows={retornos} />
       <ConsultaDisponibilidade key={dstr} date={dstr} />

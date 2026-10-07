@@ -16,7 +16,7 @@ test("cleared catalog fields stay empty after saving and reopening", async ({ pa
 
 test("failed reports do not block stock and stock does not request unrelated lists", async ({ page }) => {
   const state = await installApi(page, { role: "ADMIN" });
-  await page.route("**/api/transactions/conflicts", route => route.fulfill({ status: 503, json: { message: "Relatório indisponível" } }));
+  await page.route("**/api/transactions/dashboard", route => route.fulfill({ status: 503, json: { message: "Relatório indisponível" } }));
   await page.goto("/sistema/dashboard");
   await expect(page.getByRole("alert")).toContainText("Relatório indisponível");
   state.requests.length = 0;
@@ -28,11 +28,11 @@ test("failed reports do not block stock and stock does not request unrelated lis
 
 test("profile remains usable when commercial endpoints fail", async ({ page }) => {
   const state = await installApi(page, { role: "CLIENT" });
-  await page.route("**/api/orders?*", route => route.abort());
-  await page.route("**/api/products?*", route => route.abort());
+  await page.route("**/api/orders/page?*", route => route.abort());
+  await page.route("**/api/products/page?*", route => route.abort());
   await page.goto("/conta/perfil");
   await expect(page.getByLabel("Nome completo", { exact: true })).toHaveValue("Cliente Teste");
-  expect(state.requests.some(r => ["/products", "/orders", "/transactions"].includes(r.path))).toBe(false);
+  expect(state.requests.some(r => ["/products/page", "/orders/page", "/transactions/page"].includes(r.path))).toBe(false);
 });
 
 test("tracking follows the operation after approval", async ({ page }) => {
@@ -64,7 +64,7 @@ async function preparePackage(page) {
   await page.getByLabel("Nome do responsável").fill("Ana Silva");
   await page.getByLabel("E-mail do responsável").fill("ana@example.test");
   await page.getByLabel("Telefone do responsável").fill("11999999999");
-  await page.getByLabel("Modelo base").selectOption(ids.product);
+  await page.getByRole("combobox", { name: "Modelo base", exact: true }).selectOption(ids.product);
   await page.getByRole("button", { name: "Adicionar participante", exact: true }).click();
   await page.getByLabel("Nome do participante").fill("Pedro Silva");
   await page.getByLabel("Tamanho de referência").fill("M");

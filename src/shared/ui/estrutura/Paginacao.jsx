@@ -1,11 +1,11 @@
 import { Button } from "../botoes/Button.jsx";
 
-export default function Paginacao({ pagination, pending, error, onPage }) {
+export default function Paginacao({ pagination, pending, error, onPage, label = "Paginação da lista" }) {
   if (!pagination) return null;
   const { page, pages, total } = pagination;
   return (
     <nav
-      aria-label="Paginação da lista"
+      aria-label={label}
       className="flex items-center justify-between flex-wrap gap-3 py-5"
     >
       <p role="status" aria-live="polite" className="m-0 text-sm text-text-sub">

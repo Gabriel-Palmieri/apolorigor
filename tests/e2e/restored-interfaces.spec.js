@@ -6,7 +6,7 @@ test("unsent wedding planning stays in memory and previews the same portal", asy
   await page.goto("/pacote");
   await page.getByLabel("Nome dos noivos").fill("João e Ana");
   await page.getByLabel("Quantidade prevista de trajes").fill("3");
-  await page.getByLabel("Modelo base").selectOption(ids.product);
+  await page.getByRole("combobox", { name: "Modelo base", exact: true }).selectOption(ids.product);
   await expect(page.getByText(/750,00/)).toBeVisible();
   await page.getByRole("button", { name: "Adicionar participante", exact: true }).click();
   const editor = page.getByRole("dialog");

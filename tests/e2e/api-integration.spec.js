@@ -153,7 +153,7 @@ test("profile editing uses supported fields and rejects silently clearing saved 
 
 test("an unavailable API shows recovery without exposing a demonstration collection", async ({ page }) => {
   await installApi(page);
-  await page.route("**/api/products?*", route => route.abort("failed"));
+  await page.route("**/api/products/page?*", route => route.abort("failed"));
   await page.goto("/colecao");
   await expect(page.getByRole("alert")).toContainText("Não foi possível conectar ao servidor");
   await expect(page.getByRole("button", { name: /Terno Oxford/ })).toHaveCount(0);

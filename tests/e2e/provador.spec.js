@@ -59,7 +59,7 @@ test('invalid suit links and an empty collection have useful states', async ({ p
   await expect(page.getByText('Este modelo não está mais na coleção. Escolha outro terno abaixo.')).toBeVisible();
   await page.getByRole('button', { name: /Terno Oxford/ }).click();
   await expect(page).toHaveURL(/modelo=10000000/);
-  await page.route("**/api/products?*", route => route.fulfill({ json: [] }));
+  await page.route("**/api/products/page?*", route => route.fulfill({ json: { items: [], total: 0, page: 1, pages: 1, limit: 20 } }));
   await page.reload();
   await expect(page.getByRole('heading', { name: 'A coleção está sendo preparada.' })).toBeVisible();
 });

@@ -20,3 +20,8 @@ Aplicação web para uma loja de alfaiataria e trajes de cerimônia, com vitrine
 ## Plataforma e limites
 
 Plataforma web responsiva, incluindo navegadores de celular. O acesso à câmera depende das permissões do dispositivo e de contexto seguro; o upload permite continuar quando a câmera não está disponível. A geração depende do provedor de IA e da configuração do backend. A homologação com banco, autenticação, e-mails e geração reais permanece pendente.
+
+
+### Consultas e recuperação de envios — 07/10/2026
+
+Catálogo, provador, conta do cliente, operações, pacotes e seletores usam páginas limitadas. Dashboard e calendário recebem agregações globais, com detalhes separados; seus totais não dependem da página visível. Um pedido cuja resposta se perdeu pode ser reenviado com a mesma chave e os mesmos dados, recuperando o registro original. A garantia persistente depende da migration de idempotência preparada no backend. Aplicação no banco e deploy foram adiados pelo usuário; a validação desta entrega é local com integrações simuladas.

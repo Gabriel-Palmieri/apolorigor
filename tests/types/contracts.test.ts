@@ -30,3 +30,14 @@ descricaoAprovacao({ status: 'PAID' }, 'venda');
 // @ts-expect-error Resources must be one of the cache's supported names.
 const resource: ResourceKey = 'payments';
 void resource;
+
+import { resumoAcervo } from '../../src/domain/catalogo.js';
+import { aggDia } from '../../src/domain/agenda.js';
+import { rememberOrderIntent } from '../../src/data/orderIntent.js';
+resumoAcervo([mapped]).pecas satisfies number;
+// @ts-expect-error Stock quantity is numeric, not a formatted label.
+resumoAcervo([{ ...mapped, variantes: [{ tam: 'M', qtd: '4 peças' }] }]);
+// @ts-expect-error Calendar aggregation requires a date key.
+aggDia([], 20261007);
+// @ts-expect-error Only supported operation types can be persisted for a retry.
+rememberOrderIntent('owner', 'key', { variantId: 'id', type: 'PAYMENT', notes: '' });
