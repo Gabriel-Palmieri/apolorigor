@@ -1,6 +1,8 @@
 import { api } from "./apiClient.js";
 import { getData, refreshData } from "./cache.js";
-import { orderFromApi } from "./adapters.js";
+import { productFromApi, orderFromApi } from "./adapters.js";
+import { getSession } from "./session.js";
+import { readOrderIntent, rememberOrderIntent } from "./orderIntent.js";
 export const getPedido = (protocolo) =>
   getData().pedidos.find(
     (p) =>
@@ -10,7 +12,16 @@ export const getPedido = (protocolo) =>
         .toUpperCase(),
   ) || null;
 export async function criarPedido(dados) {
-  const product = getData().produtos.find((p) => p.id === dados.produtoId);
+  const owner = getSession()?.user.id;
+  if (!owner) throw new Error("Entre para enviar o pedido.");
+  if (!dados.requestKey) throw new Error("Selecione novamente o modelo para iniciar o pedido.");
+  const previous = readOrderIntent(owner, dados.requestKey);
+  if (previous) {
+    const row = await api("/orders", { method: "POST", body: previous, idempotencyKey: dados.requestKey });
+    await refreshData();
+    return orderFromApi(row);
+  }
+  const product = getData().produtos.find((p) => p.id === dados.produtoId) || productFromApi(await api("/products/" + encodeURIComponent(dados.produtoId), { auth: false }));
   const variant = product?.variantes.find((v) => v.tam === dados.tam);
   if (!variant)
     throw new Error("Atualize a coleção e selecione novamente o tamanho.");
@@ -23,7 +34,8 @@ export async function criarPedido(dados) {
     body.startDate = dados.retirada;
     body.endDate = dados.devolucao;
   }
-  const row = await api("/orders", { method: "POST", body });
+  rememberOrderIntent(owner, dados.requestKey, body);
+  const row = await api("/orders", { method: "POST", body, idempotencyKey: dados.requestKey });
   await refreshData();
   return orderFromApi(row);
 }

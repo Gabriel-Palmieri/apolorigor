@@ -23,6 +23,7 @@ export default function ControlesProdutoGestao({
             onChange={(event) => onBusca(event.target.value)}
             placeholder="Nome, cor ou categoria"
             type="search"
+            maxLength={120}
           />
         </Field>
         <Field label="Situação do modelo">

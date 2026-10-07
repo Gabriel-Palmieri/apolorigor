@@ -1,10 +1,13 @@
 // tamanhos cadastrados para um modelo, na ordem da grade
+/** @param {{ variantes?: { tam: string }[] }} p */
 export const tamanhosDe = (p) => (p.variantes || []).map((v) => v.tam);
 
 // menor preço de aluguel do catálogo, para a chamada "a partir de"
+/** @param {{ aluguel: number }[]} catalogo */
 export const aluguelMinimo = (catalogo) =>
   catalogo.length ? Math.min(...catalogo.map((p) => p.aluguel)) : 0;
 
+/** @type {{ id: string, titulo: string, desc: string, filtro: (p: import("./types").CatalogProduct) => boolean }[]} */
 export const VITRINES = [
   {
     id: "noivo",

@@ -25,7 +25,7 @@ export function Linha({ k, children }) {
     </div>
   );
 }
-export function Detalhe({ pedido, onClose }) {
+export function Detalhe({ pedido, onClose, onUpdated }) {
   const [motivo, setMotivo] = useState("");
   const [recusando, setRecusando] = useState(false);
   const [erro, setErro] = useState("");
@@ -36,7 +36,8 @@ export function Detalhe({ pedido, onClose }) {
     setBusy(true);
     setErro("");
     try {
-      await atualizarStatus(pedido.id, status, note);
+      const updated = await atualizarStatus(pedido.id, status, note);
+      onUpdated?.(updated);
       if (status !== "Em análise") onClose();
     } catch (error) {
       setErro(error.message);

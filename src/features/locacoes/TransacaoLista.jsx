@@ -5,6 +5,7 @@ import { Alert, Badge } from "../../shared/ui/feedback/Feedback.jsx";
 import { fmtDate, money } from "../../shared/lib/format.js";
 import { PAYMENT_STATUS, TRANSACTION_STATUS } from "../../data/adapters.js";
 import { executarTransacao } from "../../data/transacoes.js";
+import Paginacao from "../../shared/ui/estrutura/Paginacao.jsx";
 const STATUS_MAP = {
   Rascunho: { tone: "grey" },
   Confirmado: { tone: "yellow" },
@@ -192,9 +193,9 @@ function TransacaoCard({ row, admin, onEdit }) {
     </article>
   );
 }
-export default function TransacaoLista({ rows, admin = false, onEdit }) {
+export default function TransacaoLista({ rows, admin = false, onEdit, paged }) {
   const [search, setSearch] = useState("");
-  const visible = rows.filter((row) =>
+  const visible = paged ? (paged.changingPage ? [] : rows) : rows.filter((row) =>
     `${row.variant.product.name} ${row.cliente}`
       .toLowerCase()
       .includes(search.toLowerCase()),
@@ -203,12 +204,14 @@ export default function TransacaoLista({ rows, admin = false, onEdit }) {
     <div>
       <Field label="Buscar operação">
         <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={paged ? paged.params.get(paged.searchParam || "busca") || "" : search}
+          onChange={(e) => paged ? paged.filter(paged.searchParam || "busca", e.target.value) : setSearch(e.target.value)}
+          maxLength={120}
           placeholder="Modelo ou cliente"
         />
       </Field>
-      {!visible.length && (
+      {paged && <Paginacao pagination={paged.pagination} pending={paged.pending} error={paged.error} onPage={paged.changePage} />}
+      {!visible.length && !paged?.changingPage && (
         <p className="text-text-sub py-6" role="status">
           Nenhuma operação encontrada.
         </p>

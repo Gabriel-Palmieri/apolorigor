@@ -6,9 +6,15 @@ export function todayISO() {
     month: "2-digit",
     day: "2-digit",
   }).formatToParts(new Date());
-  const value = (type) => parts.find((part) => part.type === type).value;
+  /** @param {'year' | 'month' | 'day'} type */
+  const value = (type) => {
+    const part = parts.find((item) => item.type === type);
+    if (!part) throw new Error("Não foi possível determinar o dia comercial.");
+    return part.value;
+  };
   return value("year") + "-" + value("month") + "-" + value("day");
 }
+/** @param {string} dateStr @param {number} days */
 export function addDays(dateStr, days) {
   const date = new Date(dateStr + "T00:00:00Z");
   date.setUTCDate(date.getUTCDate() + days);

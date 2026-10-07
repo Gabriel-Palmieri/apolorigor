@@ -4,29 +4,21 @@ import { PEDIDO_MAP, TIPO_MAP } from "../../shared/ui/feedback/status.js";
 import { Card, TH, TD, Stat } from "../../shared/ui/estrutura/Surfaces.jsx";
 import { Chip, Badge } from "../../shared/ui/feedback/Feedback.jsx";
 import { cn } from "../../shared/lib/cn.js";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { fmt } from "../../shared/lib/format.js";
 import { usePedidos } from "../../features/pedidos/usePedidos.js";
 import { TIPO_LABEL } from "../../domain/pedidos.js";
+import { ORDER_STATUS } from "../../data/adapters.js";
+import { useListaPaginada } from "../../features/listas/useListaPaginada.js";
+import Paginacao from "../../shared/ui/estrutura/Paginacao.jsx";
 export default function Pedidos() {
   const pedidos = usePedidos();
-  const [filtro, setFiltro] = useState("Novo");
+  const { params, filter, pagination, pending, error, changingPage, changePage } = useListaPaginada("pedidos");
+  const filtro = ORDER_STATUS[params.get("status") || "NEW"] || "Todos";
   const [aberto, setAberto] = useState(null);
-  const contagem = useMemo(() => {
-    const c = {
-      Novo: 0,
-      "Em análise": 0,
-      Aprovado: 0,
-      Recusado: 0,
-    };
-    pedidos.forEach((p) => {
-      c[p.status] = (c[p.status] || 0) + 1;
-    });
-    return c;
-  }, [pedidos]);
-  const lista =
-    filtro === "Todos" ? pedidos : pedidos.filter((p) => p.status === filtro);
-  const pedidoAberto = aberto ? pedidos.find((p) => p.id === aberto) : null;
+  const contagem = Object.fromEntries(Object.entries(ORDER_STATUS).map(([key, label]) => [label, pagination?.summary?.[key] || 0]));
+  const lista = pedidos;
+  const pedidoAberto = aberto ? pedidos.find((p) => p.id === aberto.id) || aberto : null;
   return (
     <div className="apollo-anim-in">
       <div className="grid grid-cols-2 desktop:grid-cols-4 gap-3 mb-5">
@@ -58,7 +50,7 @@ export default function Pedidos() {
           {["Novo", "Em análise", "Aprovado", "Recusado", "Todos"].map((f) => (
             <button
               key={f}
-              onClick={() => setFiltro(f)}
+              onClick={() => { setAberto(null); filter("status", Object.keys(ORDER_STATUS).find(key => ORDER_STATUS[key] === f) || "ALL"); }}
               className={cn(
                 "py-1.5 px-3.5 rounded-control cursor-pointer font-sans text-caption",
                 filtro === f ? "font-semibold" : "font-medium",
@@ -73,7 +65,8 @@ export default function Pedidos() {
           ))}
         </div>
 
-        {lista.length === 0 ? (
+        <Paginacao pagination={pagination} pending={pending} error={error} onPage={page => { setAberto(null); changePage(page); }} />
+        {!changingPage && (lista.length === 0 ? (
           <p className="text-text-sub text-compact py-7 px-0 text-center">
             Nenhum pedido{" "}
             {filtro !== "Todos" ? `com status "${filtro}"` : "recebido"}.
@@ -97,11 +90,11 @@ export default function Pedidos() {
                 {lista.map((p) => (
                   <tr
                     key={p.id}
-                    onClick={() => setAberto(p.id)}
+                    onClick={() => setAberto(p)}
                     className="cursor-pointer"
                   >
                     <TD>
-                      <button type="button" onClick={() => setAberto(p.id)} aria-label={"Abrir pedido " + p.protocolo} className="font-mono tabular-nums font-semibold text-gold-text underline underline-offset-4">
+                      <button type="button" onClick={() => setAberto(p)} aria-label={"Abrir pedido " + p.protocolo} className="font-mono tabular-nums font-semibold text-gold-text underline underline-offset-4">
                         {p.protocolo}
                       </button>
                     </TD>
@@ -142,11 +135,11 @@ export default function Pedidos() {
               </tbody>
             </table>
           </TableViewport>
-        )}
+        ))}
       </Card>
 
       {pedidoAberto && (
-        <Detalhe pedido={pedidoAberto} onClose={() => setAberto(null)} />
+        <Detalhe pedido={pedidoAberto} onUpdated={setAberto} onClose={() => setAberto(null)} />
       )}
     </div>
   );

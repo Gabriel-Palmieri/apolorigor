@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { criarPedido } from "../../data/pedidos.js";
 import { updateProfile } from "../../data/auth.js";
-export function usePedidoForm(cliente, rascunho) {
+import { readOrderIntent } from "../../data/orderIntent.js";
+export function usePedidoForm(cliente, rascunho, descartarRascunho) {
+  const [attempt, setAttempt] = useState(() => readOrderIntent(cliente?.id, rascunho?.requestKey));
   const [form, setForm] = useState({
     nome: cliente?.nome || "",
     email: cliente?.email || "",
     tel: cliente?.tel || "",
     documento: cliente?.documento || "",
-    observacoes: "",
+    observacoes: attempt?.notes || "",
   });
   const [erros, setErros] = useState({});
   const [feito, setFeito] = useState(null);
@@ -15,7 +17,7 @@ export function usePedidoForm(cliente, rascunho) {
   const r = rascunho;
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   async function enviar() {
-    if (busy) return;
+    if (busy || feito || !r) return;
     const er = {};
     if (form.nome.trim().length < 2) er.nome = "Informe seu nome.";
     if (
@@ -40,16 +42,13 @@ export function usePedidoForm(cliente, rascunho) {
         observacoes: form.observacoes.trim(),
       });
       setFeito(pedido);
-      try {
-        sessionStorage.removeItem("apollo-pedido-rascunho");
-      } catch {
-        /* O pedido já foi salvo no servidor. */
-      }
+      descartarRascunho();
     } catch (error) {
+      setAttempt(readOrderIntent(cliente?.id, r?.requestKey));
       setErros({ geral: error.message });
     } finally {
       setBusy(false);
     }
   }
-  return { form, erros, feito, busy, set, enviar, r };
+  return { form, erros, feito, busy, set, enviar, r, retrying: Boolean(attempt) };
 }

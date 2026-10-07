@@ -32,11 +32,11 @@ test("product dialog contains focus and restores focus on dismissal", async ({ p
   await expect(dialog).toHaveCount(0);
   await expect(page).toHaveURL(/\/colecao$/);
 });
-test("unsupported group and tailoring flows have no local implementation", async ({ page }) => {
+test("package requests explain that sending does not confirm a contract", async ({ page }) => {
   const state = await installApi(page, { role: "CLIENT" });
   await page.goto("/casamento/" + ids.transaction);
   await expect(page.getByText(/O acompanhamento de pacotes e participantes ainda não está disponível/)).toBeVisible();
   await page.goto("/pacote");
-  await expect(page.getByText(/A contratação de pacotes para grupos ainda não está disponível/)).toBeVisible();
+  await expect(page.getByText(/não confirma preço, contrato, disponibilidade ou reserva/)).toBeVisible();
   expect(state.requests.some(r => /pacote|casamento|ajuste|repair|group/.test(r.path))).toBe(false);
 });

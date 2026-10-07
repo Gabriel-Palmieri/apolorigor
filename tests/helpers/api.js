@@ -1,3 +1,7 @@
+import { productFromApi, orderFromApi, transactionFromApi } from "../../src/data/adapters.js";
+import { resumoDashboard, resumoOperacoes } from "../../src/domain/dashboard.js";
+import { resumoAcervo } from "../../src/domain/catalogo.js";
+import { VITRINES } from "../../src/domain/vitrine.js";
 import { expect } from "@playwright/test";
 export const ids = {
   product: "10000000-0000-4000-8000-000000000001",
@@ -104,11 +108,13 @@ export async function installApi(page, options = {}) {
     products: [structuredClone(product)],
     orders: options.orders || [],
     transactions: options.transactions || [],
+    packages: options.packages || [],
     profile: { ...client },
-    requests: [],
+    requests: [], profiles: options.profiles || [{ ...client }], intents: new Map(),
     refreshes: 0,
     available: options.available ?? 3,
   };
+  await page.route("https://www.apollorigor.com.br/images/logo-apollo-oficial.jpg", route => route.abort());
   if (options.role)
     await page.addInitScript(
       (value) =>
@@ -127,22 +133,36 @@ export async function installApi(page, options = {}) {
     const url = new URL(request.url());
     const path = url.pathname.replace(/^\/api/, "");
     const method = request.method();
-    const body = request.postDataJSON();
+    const body = request.headers()["content-type"]?.startsWith("multipart/form-data") ? request.postData() : request.postDataJSON();
     const token = request.headers().authorization || "";
     const role = token.includes("admin") ? "ADMIN" : "CLIENT";
-    state.requests.push({ path, method, body, token });
+    state.requests.push({ path, method, body, token, idempotencyKey: request.headers()["idempotency-key"], query: Object.fromEntries(url.searchParams) });
     const reply = (data, status = 200) =>
       route.fulfill({
         status,
         contentType: "application/json",
         headers: {
           "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "Authorization, Content-Type",
+          "Access-Control-Allow-Headers": "Authorization, Content-Type, Idempotency-Key",
           "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
         },
         body: JSON.stringify(data),
       });
     if (method === "OPTIONS") return reply({});
+    if (path === "/wedding-packages" && method === "POST") {
+      if (options.packageFails) return reply({ message: "Não foi possível salvar a solicitação." }, 503);
+      expect(Object.keys(body).every(key => ["coupleNames", "eventDate", "expectedMembers", "baseProductId", "contactName", "contactEmail", "contactPhone", "notes", "participants"].includes(key))).toBe(true);
+      const pkg = { ...body, id: "package-1", status: "REQUESTED" };
+      state.packages.push(pkg);
+      return reply(pkg, 201);
+    }
+    if (path.startsWith("/virtual-fitting/") && method === "POST") {
+      expect(body).toContain('name="photo"');
+      expect(body).toContain('name="garment"');
+      expect(body).toMatch(/name="consent"\r\n\r\ntrue/);
+      if (options.fittingFails) return reply({ message: "Não foi possível gerar a prévia." }, 502);
+      return reply({ imageUrl: "https://images.example.test/previa.jpg" });
+    }
     if (path === "/auth/login") {
       expect(Object.keys(body).sort()).toEqual(["email", "password"]);
       if (body.password !== "senha-segura")
@@ -185,7 +205,7 @@ export async function installApi(page, options = {}) {
     const publicPath =
       method === "GET" &&
       path.startsWith("/products") &&
-      path !== "/products/admin/all";
+      !path.startsWith("/products/admin/");
     if (!publicPath && (!token || token.includes("expired")))
       return reply({ message: "Sessão inválida." }, 401);
     if (path === "/auth/me") {
@@ -204,7 +224,56 @@ export async function installApi(page, options = {}) {
       expect(Object.keys(body)).toEqual(["password"]);
       return reply({ message: "Senha atualizada." });
     }
+    if (path === "/transactions/dashboard") {
+      const produtos = state.products.map(productFromApi);
+      const trans = state.transactions.map(row => transactionFromApi(row, state.profiles, state.orders));
+      return reply({ ...resumoDashboard({ produtos, trans, pedidos: state.orders.map(orderFromApi), conflicts: { overdue: [], conflicts: [] } }, new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" })), acervo: resumoAcervo(produtos), operacoes: resumoOperacoes(trans) });
+    }
+    if (path === "/transactions/calendar") {
+      const days = [];
+      const end = new Date(url.searchParams.get("end"));
+      for (let date = new Date(url.searchParams.get("start")); date <= end; date.setUTCDate(date.getUTCDate() + 1)) {
+        const day = date.toISOString().slice(0, 10);
+        const rows = state.transactions.filter(row => row.type === "RENTAL" && row.status === "CONFIRMED");
+        days.push({ day, nSaidas: rows.filter(row => row.startDate === day).length, nRetornos: rows.filter(row => row.endDate === day).length, nAtivos: rows.filter(row => row.startDate <= day && row.endDate >= day).length });
+      }
+      return reply(days);
+    }
     if (path === "/profiles") return reply([state.profile]);
+    const orderSummary = () => Object.fromEntries(["NEW", "UNDER_REVIEW", "APPROVED", "REJECTED"].map(status => [status, state.orders.filter(row => row.status === status).length]));
+    if (path === "/orders/summary") return reply(orderSummary());
+    if (["/products/page", "/profiles/page", "/products/admin/page", "/orders/page", "/transactions/page", "/wedding-packages/page"].includes(path)) {
+      const limit = Number(url.searchParams.get("limit") || 20);
+      const q = (url.searchParams.get("q") || "").toLowerCase().trim();
+      let rows;
+      let summary;
+      if (path === "/products/admin/page" || path === "/products/page") {
+        const status = url.searchParams.get("state");
+        rows = state.products.filter(row => (status === "active" ? row.active : status === "inactive" ? !row.active : true) && q.split(/\s+/).every(term => `${row.name} ${row.color} ${row.category}`.toLowerCase().includes(term)));
+        if (path === "/products/page") rows = rows.filter(row => row.active);
+        if (url.searchParams.get("category")) rows = rows.filter(row => row.category === url.searchParams.get("category"));
+        const showcase = VITRINES.find(item => item.id === url.searchParams.get("showcase"));
+        if (showcase) rows = rows.filter(row => showcase.filtro(productFromApi(row)));
+        summary = { modelos: state.products.length, ativos: state.products.filter(row => row.active).length, inativos: state.products.filter(row => !row.active).length, pecas: state.products.reduce((total, row) => total + row.variants.reduce((sum, variant) => sum + variant.quantity, 0), 0) };
+      } else if (path === "/orders/page") {
+        rows = state.orders.filter(row => !url.searchParams.get("status") || row.status === url.searchParams.get("status"));
+        if (url.searchParams.get("protocol")) rows = rows.filter(row => row.protocol === url.searchParams.get("protocol"));
+        summary = orderSummary();
+      } else if (path === "/transactions/page") {
+        rows = state.transactions.map(row => ({ ...row, profile: { name: state.profile.name } })).filter(row => q.split(/\s+/).every(term => `${row.variant.product.name} ${row.profile.name}`.toLowerCase().includes(term)));
+        if (url.searchParams.get("type")) rows = rows.filter(row => row.type === url.searchParams.get("type"));
+        if (url.searchParams.get("status")) rows = rows.filter(row => row.status === url.searchParams.get("status"));
+        if (url.searchParams.get("day")) rows = rows.filter(row => row.startDate <= url.searchParams.get("day") && row.endDate >= url.searchParams.get("day"));
+        summary = { overdue: 0 };
+      } else if (path === "/profiles/page") rows = state.profiles.filter(row => (row.name + " " + row.email).toLowerCase().includes(q));
+      else rows = state.packages;
+      rows = [...rows].sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")) || b.id.localeCompare(a.id));
+      if (url.searchParams.get("sort") === "date") rows.sort((a, b) => a.startDate.localeCompare(b.startDate) || a.id.localeCompare(b.id));
+      const pages = Math.max(1, Math.ceil(rows.length / limit));
+      const page = Math.min(Number(url.searchParams.get("page") || 1), pages);
+      return reply({ items: rows.slice((page - 1) * limit, page * limit), total: rows.length, page, pages, limit, summary });
+    }
+    if (path === "/wedding-packages") return reply(state.packages);
     if (path === "/transactions/conflicts")
       return reply({ overdue: [], conflicts: [] });
     if (path.endsWith("/availability")) {
@@ -272,7 +341,13 @@ export async function installApi(page, options = {}) {
       const index = (Number(url.searchParams.get("page")) - 1) * 100;
       return reply(rows.slice(index, index + 100));
     }
+    if (method === "GET" && /^\/products\/(?:admin\/)?[^/]+$/.test(path)) {
+      const selected = state.products.find(row => row.id === path.split("/").at(-1) && (path.includes("/admin/") || row.active));
+      return selected ? reply(selected) : reply({ message: "Modelo não encontrado." }, 404);
+    }
     if (path === "/orders" && method === "POST") {
+      const key = request.headers()["idempotency-key"];
+      if (key && state.intents.has(key)) return reply(state.intents.get(key), 201);
       expect(
         Object.keys(body).every((key) =>
           ["variantId", "type", "startDate", "endDate", "notes"].includes(key),
@@ -287,6 +362,8 @@ export async function installApi(page, options = {}) {
         quotedPriceCents: body.type === "SALE" ? 90000 : 25000,
       });
       state.orders.push(result);
+      if (key) state.intents.set(key, result);
+      if (options.loseOrderResponse) { options.loseOrderResponse = false; return route.abort(); }
       return reply(result, 201);
     }
     const transition = path.match(

@@ -1,8 +1,12 @@
 import { useData } from "../data/useData.js";
-import { refreshData } from "../data/cache.js";
+import { dataStatus, refreshData } from "../data/cache.js";
+import { useLocation } from "react-router-dom";
+import { resourcesForRoute } from "./dataScope.js";
 import { Button } from "../shared/ui/botoes/Button.jsx";
 export function DataBoundary({ children }) {
-  const data = useData();
+  const cached = useData();
+  const { pathname, search } = useLocation();
+  const data = dataStatus(cached, resourcesForRoute(pathname, search));
   if (!data.initialized) {
     if (data.error) return (
       <div className="max-w-xl mx-auto px-6 py-12">

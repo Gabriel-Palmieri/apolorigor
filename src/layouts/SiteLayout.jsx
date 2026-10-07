@@ -3,7 +3,8 @@ import { Outlet, useLocation, useMatch, useNavigate } from "react-router-dom";
 import SiteNav from "./SiteNav.jsx";
 import DetalheProdutoVitrine from "../features/catalogo/DetalheProdutoVitrine.jsx";
 import { useSessao } from "../features/conta/sessao.js";
-import { useCatalogo, useData } from "../data/useData.js";
+import { useRequest } from "../data/useRequest.js";
+import { productFromApi } from "../data/adapters.js";
 import { useSiteNavigation } from "../app/useSiteNavigation.js";
 import { SITE_PATHS } from "../app/navigation.js";
 import InicioAtelie from "../features/inicio/InicioAtelie.jsx";
@@ -12,18 +13,18 @@ export default function SiteLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const go = useSiteNavigation();
-  const catalogo = useCatalogo();
-  const { initialized } = useData();
   const produtoRoute = useMatch("/colecao/:produtoId");
-  const produtoAberto = catalogo.find(
-    (p) => String(p.id) === produtoRoute?.params.produtoId,
-  );
+  const detail = useRequest(produtoRoute ? "/products/" + encodeURIComponent(produtoRoute.params.produtoId) : null, false);
+  const produtoAberto = detail.data ? productFromApi(detail.data) : null;
   const sessao = useSessao();
   const cliente = sessao?.tipo === "cliente" ? sessao : null;
   const [rascunho, setRascunho] = useState(() => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(DRAFT_KEY));
-      return saved && saved.produtoId && saved.tam ? saved : null;
+      if (!saved?.produtoId || !saved.tam) return null;
+      saved.requestKey ||= crypto.randomUUID();
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(saved));
+      return saved;
     } catch {
       return null;
     }
@@ -32,8 +33,17 @@ export default function SiteLayout() {
     (produto) => navigate("/colecao/" + produto.id + location.search),
     [navigate, location.search],
   );
+  const descartarRascunho = useCallback(() => {
+    setRascunho(null);
+    try {
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      /* A memória é limpa mesmo quando o armazenamento está indisponível. */
+    }
+  }, []);
   const continuarPedido = useCallback(
     (payload) => {
+      payload = { ...payload, requestKey: crypto.randomUUID() };
       setRascunho(payload);
       try {
         sessionStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
@@ -62,6 +72,7 @@ export default function SiteLayout() {
               go,
               openProduto,
               rascunho,
+              descartarRascunho,
               cliente,
               scrollTo,
             }}
@@ -77,9 +88,10 @@ export default function SiteLayout() {
           onContinuar={continuarPedido}
         />
       )}
-      {initialized && produtoRoute && !produtoAberto && (
+      {produtoRoute && detail.error && (
         <p className="product-missing" role="status">
-          Modelo não encontrado.{" "}
+          {detail.error.status === 404 ? "Modelo não encontrado." : detail.error.message}{" "}
+          {detail.error.status !== 404 && <button onClick={detail.retry}>Tentar novamente</button>}
           <button onClick={() => go("colecao")}>Voltar à coleção</button>
         </p>
       )}

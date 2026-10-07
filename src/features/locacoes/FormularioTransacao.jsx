@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useData } from "../../data/useData.js";
+import { useRequest } from "../../data/useRequest.js";
+import { productFromApi } from "../../data/adapters.js";
+import SeletorPaginado from "../listas/SeletorPaginado.jsx";
 import { salvarTransacao } from "../../data/transacoes.js";
 import { consultarDisponibilidade } from "../../data/catalogo.js";
 import { Drawer } from "../../shared/ui/dialogos/Modal.jsx";
@@ -11,7 +13,6 @@ export default function FormularioTransacao({
   initialType = "RENTAL",
   onClose,
 }) {
-  const { produtos, profiles } = useData();
   const [type, setType] = useState(row?.type || initialType);
   const [profileId, setProfileId] = useState(row?.profileId || "");
   const [productId, setProductId] = useState(row?.variant.productId || "");
@@ -21,7 +22,8 @@ export default function FormularioTransacao({
   const [endDate, setEndDate] = useState(row?.endDate || "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const product = produtos.find((p) => p.id === productId);
+  const detail = useRequest(productId ? "/products/admin/" + encodeURIComponent(productId) : null);
+  const product = detail.data ? productFromApi(detail.data) : null;
   async function submit(event) {
     event.preventDefault();
     if (busy) return;
@@ -80,42 +82,11 @@ export default function FormularioTransacao({
                 <option value="SALE">Venda</option>
               </Select>
             </Field>
-            <Field label="Cliente cadastrado">
-              <Select
-                required
-                value={profileId}
-                onChange={(e) => setProfileId(e.target.value)}
-              >
-                <option value="">Selecione</option>
-                {profiles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} · {p.email}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+            <SeletorPaginado endpoint="/profiles/page" label="Cliente cadastrado" searchLabel="Filtrar pessoas" value={profileId} onChange={setProfileId} />
           </>
         )}
-        <Field label="Modelo">
-          <Select
-            required
-            value={productId}
-            onChange={(e) => {
-              setProductId(e.target.value);
-              setVariantId("");
-              setPrice("");
-            }}
-          >
-            <option value="">Selecione</option>
-            {produtos
-              .filter((p) => p.ativo || p.id === row?.variant.productId)
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nome}
-                </option>
-              ))}
-          </Select>
-        </Field>
+        <SeletorPaginado endpoint="/products/admin/page?state=active" label="Modelo" searchLabel="Filtrar trajes" value={productId} selectedLabel={product?.nome || row?.variant.product.name} onChange={id => { setProductId(id); setVariantId(""); setPrice(""); }} />
+        {detail.error && <Alert>{detail.error.message} <button type="button" onClick={detail.retry}>Tentar novamente</button></Alert>}
         <Field label="Tamanho">
           <Select
             required

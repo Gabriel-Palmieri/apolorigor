@@ -1,4 +1,5 @@
 import { buildEventos } from "./agenda.js";
+/** @param {{ status: import("./types").OperacaoStatus, type: string, priceCents: number }[]} trans */
 export function resumoOperacoes(trans) {
   const registradas = trans.filter((transacao) =>
     ["CONFIRMED", "COMPLETED"].includes(transacao.status),
@@ -14,6 +15,7 @@ export function resumoOperacoes(trans) {
     ),
   };
 }
+/** @param {{ produtos: import("./types").CatalogProduct[], trans: import("./types").CalendarTransaction[], pedidos: { status: import("./types").PedidoStatus }[], conflicts: { overdue: unknown[], conflicts: unknown[] } }} data @param {string} hoje */
 export function resumoDashboard({ produtos, trans, pedidos, conflicts }, hoje) {
   const eventos = buildEventos(produtos, trans);
   const proximos = eventos

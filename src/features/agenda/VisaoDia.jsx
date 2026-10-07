@@ -23,34 +23,36 @@ function Bloco({ title, rows, date }) {
     </section>
   );
 }
-export default function VisaoDia({ dstr, eventos, cap }) {
-  const { saidas, retornos, ativos, nSaidas, nRetornos, nAtivos } = aggDia(
-    eventos,
-    dstr,
-  );
+export default function VisaoDia({ dstr, eventos, counts, cap }) {
+  const { saidas, retornos, ativos, nSaidas, nRetornos, nAtivos } = {
+    ...aggDia(eventos, dstr),
+    ...counts?.[dstr],
+  };
   return (
     <div>
       <div className="grid grid-cols-1 tablet:grid-cols-3 gap-3 mb-5">
         <MiniStat
           label="Retiradas"
           val={nSaidas}
-          sub={saidas.length + " operação(ões)"}
+          sub={nSaidas + " operação(ões)"}
           textClassName={capacityAppearance(nSaidas, cap).textClassName}
         />
         <MiniStat
           label="Devoluções"
           val={nRetornos}
-          sub={retornos.length + " operação(ões)"}
+          sub={nRetornos + " operação(ões)"}
           textClassName="text-gold"
         />
         <MiniStat
           label="Locações no período"
           val={nAtivos}
-          sub={ativos.length + " operação(ões)"}
+          sub={nAtivos + " operação(ões)"}
           textClassName="text-text"
         />
       </div>
       <CapacityBar n={nSaidas} cap={cap} label="Carga prevista de retiradas" />
+      <p className="text-xs text-text-sub">Os totais consideram todas as reservas. As listas abaixo mostram as operações desta página.</p>
+      <Bloco title="Locações nesta página" rows={ativos} />
       <Bloco title="Retiradas do dia" rows={saidas} />
       <Bloco title="Devoluções do dia" rows={retornos} />
       <ConsultaDisponibilidade key={dstr} date={dstr} />

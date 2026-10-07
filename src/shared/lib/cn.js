@@ -18,4 +18,5 @@ const merge = extendTailwindMerge({
     },
   },
 });
+/** @param {...import("clsx").ClassValue} values */
 export const cn = (...values) => merge(clsx(values));

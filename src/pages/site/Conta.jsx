@@ -1,3 +1,5 @@
+import { useListaPaginada } from "../../features/listas/useListaPaginada.js";
+import Paginacao from "../../shared/ui/estrutura/Paginacao.jsx";
 import { useState } from "react";
 import { useLocation, useOutletContext } from "react-router-dom";
 import { MeusPedidos } from "../../features/conta/MeusPedidos.jsx";
@@ -9,10 +11,13 @@ import { Alert } from "../../shared/ui/feedback/Feedback.jsx";
 import { useData } from "../../data/useData.js";
 import { useSessao, sair } from "../../features/conta/sessao.js";
 import TransacaoLista from "../../features/locacoes/TransacaoLista.jsx";
+import AtualizarDados from "../../features/conta/AtualizarDados.jsx";
 export default function Conta() {
   const { go } = useOutletContext();
   const location = useLocation();
   const { pedidos, trans, loading } = useData();
+  const pedidosPage = useListaPaginada("pedidos", "paginaPedidos");
+  const transPage = useListaPaginada("trans", "paginaOperacoes", "buscaOperacoes");
   const sessao = useSessao();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -45,6 +50,7 @@ export default function Conta() {
         </div>
         {error && <Alert>{error}</Alert>}
         <nav className="flex gap-3 flex-wrap my-8" aria-label="Área do cliente">
+          {!perfil && <AtualizarDados />}
           <Button
             variant={perfil ? "ghost" : "solid"}
             onClick={() => go("conta", "pedidos")}
@@ -73,11 +79,12 @@ export default function Conta() {
                 Atualizando pedidos…
               </p>
             )}
-            <MeusPedidos pedidos={pedidos} go={go} />
+            {!pedidosPage.changingPage && <MeusPedidos pedidos={pedidos} go={go} />}
+            <Paginacao pagination={pedidosPage.pagination} pending={pedidosPage.pending} error={pedidosPage.error} onPage={pedidosPage.changePage} />
             <h3 className="mt-10 text-xl font-medium">
               Minhas compras e locações
             </h3>
-            <TransacaoLista rows={trans} />
+            <TransacaoLista rows={trans} paged={transPage} />
           </>
         )}
       </Wrap>

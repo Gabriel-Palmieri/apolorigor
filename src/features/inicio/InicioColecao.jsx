@@ -8,7 +8,11 @@ import { useData } from "../../data/useData.js";
 import { refreshData } from "../../data/cache.js";
 
 export default function InicioColecao({ go, openProduto, destaques }) {
-  const { error, loading, initialized } = useData();
+  const {
+    resources: {
+      produtos: { error, loading, initialized },
+    },
+  } = useData();
   return (
     <Section id="colecao-preview">
       <Wrap>
@@ -33,12 +37,33 @@ export default function InicioColecao({ go, openProduto, destaques }) {
             </button>
           ))}
         </nav>
-        {error && <div className="py-6 border-y border-border-soft">
-          <p role="alert" className="mt-0 mb-4 text-sm text-text-sub">Não foi possível atualizar a coleção. {destaques.length ? "Os modelos exibidos podem ter sido atualizados." : "Tente novamente em instantes."}</p>
-          <Button variant="ghost" disabled={loading} onClick={() => refreshData()}>{loading ? "Tentando novamente…" : "Tentar novamente"}</Button>
-        </div>}
-        {!initialized && loading && <p role="status" className="text-sm text-text-sub">Carregando coleção…</p>}
-        {initialized && !error && !destaques.length && <p className="text-sm text-text-sub">A coleção está sendo preparada.</p>}
+        {error && (
+          <div className="py-6 border-y border-border-soft">
+            <p role="alert" className="mt-0 mb-4 text-sm text-text-sub">
+              Não foi possível atualizar a coleção.{" "}
+              {destaques.length
+                ? "Os modelos exibidos podem ter sido atualizados."
+                : "Tente novamente em instantes."}
+            </p>
+            <Button
+              variant="ghost"
+              disabled={loading}
+              onClick={() => refreshData()}
+            >
+              {loading ? "Tentando novamente…" : "Tentar novamente"}
+            </Button>
+          </div>
+        )}
+        {!initialized && loading && (
+          <p role="status" className="text-sm text-text-sub">
+            Carregando coleção…
+          </p>
+        )}
+        {initialized && !error && !destaques.length && (
+          <p className="text-sm text-text-sub">
+            A coleção está sendo preparada.
+          </p>
+        )}
         <div className="collection-grid">
           {destaques.map((p) => (
             <CartaoProdutoVitrine key={p.id} produto={p} onOpen={openProduto} />

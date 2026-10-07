@@ -4,6 +4,7 @@ import { useMediaQuery } from "../shared/lib/useMediaQuery.js";
 import { Outlet, useLocation } from "react-router-dom";
 import { DataBoundary } from "../app/DataBoundary.jsx";
 import BotaoSair from "../features/conta/BotaoSair.jsx";
+import AtualizarDados from "../features/conta/AtualizarDados.jsx";
 import { ERP_NAV as NAV } from "../app/navigation.js";
 import ErpSidebar from "./ErpSidebar.jsx";
 import { ThemeToggle } from "../shared/ui/tema/ThemeToggle.jsx";
@@ -62,7 +63,8 @@ export default function ErpLayout() {
             <h1 className="m-0 text-2xl font-sans font-medium text-text">
               {nav.label}
             </h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-end flex-wrap gap-3">
+              <AtualizarDados />
               <BotaoSair />
               <ThemeToggle variant="minimal" />
             </div>

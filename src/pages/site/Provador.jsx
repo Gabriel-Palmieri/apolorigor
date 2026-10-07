@@ -1,3 +1,7 @@
+import { useRequest } from "../../data/useRequest.js";
+import { productFromApi } from "../../data/adapters.js";
+import { useListaPaginada } from "../../features/listas/useListaPaginada.js";
+import Paginacao from "../../shared/ui/estrutura/Paginacao.jsx";
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCatalogo } from "../../data/useData.js";
@@ -13,9 +17,9 @@ export default function Provador() {
   const modelos = ternosParaProva(useCatalogo());
   const [params, setParams] = useSearchParams();
   const requested = params.get("modelo");
-  const selected = requested
-    ? modelos.find((modelo) => String(modelo.id) === requested)
-    : modelos[0];
+  const paged = useListaPaginada("produtos");
+  const detail = useRequest(requested ? "/products/" + encodeURIComponent(requested) : null, false);
+  const selected = requested ? (detail.data ? ternosParaProva([productFromApi(detail.data)])[0] : null) : modelos[0];
   const capture = useFotoProvador();
   const [preview, setPreview] = useState(null);
   const previewRef = useRef(null);
@@ -86,16 +90,22 @@ export default function Provador() {
             <div className="fitting-workspace">
               <CapturaFoto capture={capture} />
               <div className="fitting-selection">
-                {!selected && (
+                {!selected && !detail.loading && (
                   <p role="status" className="fitting-error">
-                    Este modelo não está mais na coleção. Escolha outro terno
-                    abaixo.
+                    {detail.error && detail.error.status !== 404 ? detail.error.message : "Este modelo não está mais na coleção. Escolha outro terno abaixo."}
+                    {detail.error && detail.error.status !== 404 && <button onClick={detail.retry}>Tentar novamente</button>}
                   </p>
                 )}
                 <SeletorTraje
-                  modelos={modelos}
+                  modelos={paged.changingPage ? [] : modelos}
                   selected={selected}
                   onSelect={select}
+                />
+                <Paginacao
+                  pagination={paged.pagination}
+                  pending={paged.pending}
+                  error={paged.error}
+                  onPage={paged.changePage}
                 />
                 <div className="fitting-review">
                   <p>
